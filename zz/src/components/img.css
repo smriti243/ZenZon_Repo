@@ -1,0 +1,12 @@
+.trying{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 3;
+   
+}
+.img{
+    margin-left: 75px;
+    height: 80%;
+    width: auto
+}

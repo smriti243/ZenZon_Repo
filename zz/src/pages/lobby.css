@@ -1,0 +1,73 @@
+.Your{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    font-family: "Inter",sans-serif;
+    font-weight: 1000;
+    font-size: 50px;
+    margin-left:9% ;
+    color: #0c3b2e;
+}
+.Lobby{
+    color: #0c3b2e;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    margin-top: 100px;
+    margin-left: 10.5%;
+    margin-top: 12%;
+    font-family: "Inter",sans-serif;
+    font-weight: 1000;
+    font-size: 50px;
+    -webkit-text-stroke:3px ;
+    -webkit-text-fill-color: #ffffee;
+}
+.lobby1{
+    grid-row-start: 3;
+    grid-row-end: 4;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    height: 59px;
+    width: 80%;
+    margin-left: 5%;
+    background-color: #d9d9d9;
+    border-radius:25px ;
+}
+.circle1{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 40px;
+    width: 40px;
+    margin: 10px;
+    border-radius: 50px;
+    background-color: #0c3b2e;
+   
+}
+.lobby2{
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 59px;
+    width:80%;
+    margin-left: 5%;
+    margin-top: 5%;
+    background-color: #d9d9d9;
+    border-radius:25px ;
+}
+.lobby3{
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 59px;
+    width: 80%;
+    margin-left: 5%;
+    margin-top: 10%;
+    background-color: #d9d9d9;
+    border-radius:25px ;
+}

@@ -1,0 +1,43 @@
+.hd{
+    /* border: 5px black solid; */
+    display: grid;
+    grid-template-columns: 20% 60% 5% 15%;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start:1 ;
+    grid-row-end: 2;
+
+}
+.cName{
+    font-family: "cocogoose", sans-serif;
+    font-weight: 1000;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    margin-left: 45%;
+    color: #6D9773;
+}
+.login{
+    grid-column-start:4 ;
+    grid-column-end: 5;
+    font-weight: 600;
+    font-family: "Lalezar", system-ui;
+    grid-row-start:1 ;
+    grid-row-end: 2;
+    color: #6D9773;
+}
+.signup{
+    font-family: "Lalezar", system-ui;
+    margin-right: 5px;
+    grid-column-start: 4;
+    grid-column-end: 5;
+    margin-left: 100px;
+    font-weight:600;
+    grid-row-start:1 ;
+    grid-row-end: 2;
+    color: #6D9773;
+}
+.linkStyle{
+    text-decoration: none;
+    color: #6D9773;
+    
+}

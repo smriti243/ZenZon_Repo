@@ -1,0 +1,157 @@
+body{
+    background: linear-gradient(#ffffee, #6d9773);
+    background-repeat: no-repeat;
+    background-position: fixed;
+    height: 708px;
+    margin: 0%;
+    overflow: hidden;
+}
+.WhiteBox{
+    /* border: 5px black solid; */
+    height: 600px;
+    width: 93%;
+    background-color: #ffffee;
+    margin: 50px;
+    border-radius: 45px;
+    box-shadow: 1px 1px 70px black;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 5% 35% 60%;
+}
+.cName1{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    margin-left: 10%;
+    font-family: "cocogoose",sans-serif;
+    font-weight: 1000;
+    color: #6d9773;
+}
+.Create{
+    color: #0c3b2e;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    font-family: "Inter",sans-serif;
+    font-weight: 1000;
+    font-size: 50px;
+    margin-left:9% ;
+
+}
+.Challenge{
+    color: #0c3b2e;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    margin-top: 100px;
+    margin-left: 9%;
+    font-family: "Inter",sans-serif;
+    font-weight: 1000;
+    font-size: 50px;
+    -webkit-text-stroke:3px ;
+    -webkit-text-fill-color: #ffffee;
+}
+.chName {
+    grid-column-end: 1;
+    grid-column-start: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 44px;
+    width: 60%;
+    margin-left: 10%;
+    border-radius: 40px;
+    background-color: #d9d9d9;
+    border: 1px black solid;
+    /* margin-top: 30%; */
+}
+
+.chFormat{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 44px;
+    width: 60%;
+    margin-left: 10%;
+    margin-top: 9%;
+    border-radius: 40px;
+    background-color: #d9d9d9;
+    border: 1px black solid;
+}
+
+.chDeadline{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 44px;
+    width: 60%;
+    margin-left: 10%;
+    margin-top: 18%;
+    border-radius: 40px;
+    background-color: #d9d9d9;
+    border: 1px black solid;
+}
+.chStakes{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 44px;
+    width: 60%;
+    margin-left: 10%;
+    margin-top: 27%;
+    border-radius: 40px;
+    background-color: #d9d9d9;
+    border: 1px black solid;
+}
+.chDescription{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 145px;
+    width: 60%;
+    margin-left: 10%;
+    border-radius: 40px;
+    background-color: #d9d9d9;
+    border: 1px black solid;
+}
+.ccBTN{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    margin-top: 23%;
+    height: 42px;
+    width: 30%;
+    margin-left: 10%;
+    border-radius: 45px;
+    background-color: #ffba00;
+    border: none;
+    color: #ffffee;
+    font-family: "coolvetica", sans-serif;
+    font-weight: 550;
+    font-size: large;
+}
+.ifBTN{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    margin-top: 23%;
+    height: 42px;
+    width: 30%;
+    margin-top: 30%;
+    margin-left: 10%;
+    border-radius: 45px;
+    background-color: #ffffee;
+    border: 5px #ffba00 solid;
+    color: #ffba00;
+    font-family: "coolvetica", sans-serif;
+    font-weight: 550;
+    font-size: large;
+}
