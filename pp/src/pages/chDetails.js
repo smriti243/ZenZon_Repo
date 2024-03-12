@@ -2,6 +2,8 @@ import React from "react";
 import './chDetails.css'
 
 function ChallengePage(){
+    
+
     return(
         <div className="WhiteBox">
             <h2 className="cName1">ZENZONE</h2>

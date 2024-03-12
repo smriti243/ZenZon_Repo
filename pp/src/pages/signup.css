@@ -119,6 +119,21 @@
     color:#ffffee ;
     /* margin-left: 5%; */
 }
+.LinkStyle_loginbtn_form{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    margin-right: 10%;
+    height: 40px;
+    width: 100%;
+    border-radius: 45px;
+    border: none;
+    font-family: "Inter", sans-serif;
+    font-weight: 650;
+    color:#ffffee ;
+    /* margin-left: 5%; */
+}
 .linkbtn{
     grid-row-start: 3;
     grid-row-end: 4;

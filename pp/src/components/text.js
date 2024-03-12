@@ -7,7 +7,7 @@ function Text(){
             <p className="challenge">CHALLENGE</p>
             <p className="yourself">YOURSELF.</p>
             <h3 className="block">JOIN OUR COMMUNITY AND TAKE ON EXCITING NEW CHALLENGES TO PUSH YOURSELF.</h3>
-            <button className="btn1">GET STARTED</button>
+            <Link to='../signup'><button className="btn1">GET STARTED</button></Link>
             <br />
             <button className="btn2">LEARN MORE</button>
             

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import './signup.css';
 import axios from 'axios'
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import img from '../assests/WhatsApp Image 2024-03-04 at 11.14.21_67e52370.jpg'
 
@@ -11,11 +12,14 @@ function SignupPage(){
     const [username, setUsername] = useState()
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
+    const navigate = useNavigate()
 
     const handleSubmit = (e) => {
         e.preventDefault()
         axios.post('http://localhost:3001/signup',{name, username, email, password})
-        .then(result => console.log(result))
+        .then(result => {console.log(result)
+        navigate('/login')
+        })
         .catch(err => console.log(err))
     }
 
@@ -56,7 +60,7 @@ function SignupPage(){
             </input>
             <button type="submit" className="submitbtn">SIGNUP</button>
             </form>
-            <Link></Link><button className="linkbtn">LOGIN</button>
+            <Link to='../login' className="LinkStyle_loginbtn_form"><button className="linkbtn">LOGIN</button></Link>
             
         </div>
         

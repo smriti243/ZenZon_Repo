@@ -36,8 +36,17 @@
     grid-row-end: 2;
     color: #6D9773;
 }
-.linkStyle{
+.LinkStyle_header_login{
     text-decoration: none;
     color: #6D9773;
-    
+    grid-column-start:4 ;
+    grid-column-end: 5;
+    grid-row-start: 1;
+}
+.LinkStyle_header_signup{
+    text-decoration: none;
+    color: #6D9773;
+    grid-column-start:4 ;
+    grid-column-end: 5; 
+    grid-row-start: 1;
 }
