@@ -18,7 +18,7 @@ function Home() {
        <div className="bg">
             <div className="hd">
             <h2 className="cName">ZENZONE</h2>
-            <h3 className="login">SHAME</h3>
+            <h3 className="login">PROFILE</h3>
             <h3 className="signup" onClick={togglePopup}>CHALLENGES</h3>
         </div>
         <div className="txt">

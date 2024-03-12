@@ -7,6 +7,7 @@ import ChallengePage from '../pages/chDetails';
 import Lobby from '../pages/lobby';
 import SignupPage from '../pages/signup'; 
 import LoginPage from '../pages/login';
+import Profile from '../pages/profile';
 
 import Bg from './background';
 
@@ -19,6 +20,7 @@ function App() {
              <Route path="/lobby" element={<Lobby />} />
              <Route path="/signup" element={<SignupPage />} />
              <Route path="/login" element={<LoginPage />} />
+             <Route path="/profile" element={<Profile />} />
             </Routes>
         
     </div>);
