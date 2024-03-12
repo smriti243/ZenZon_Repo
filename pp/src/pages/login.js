@@ -61,7 +61,7 @@ function LoginPage(){
             </input>
             <button type="submit" className="submitbtn1">LOGIN</button>
             </form>
-           <Link to='../signup' className='LinkStyle_signupbtn_form'><button className="linkbtn">SIGNUP</button></Link> 
+           <Link to='../signup' className='LinkStyle_signupbtn_form'><button className="linkbtn2">SIGNUP</button></Link> 
             
         </div>
     )

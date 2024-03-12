@@ -19,4 +19,24 @@
     grid-column-end: 3;
     grid-row-start: 3;
     grid-row-end: 4;
+    /* border: 5px black solid; */
+    height: 30px;
+ 
+    margin-top: 95%;
+}
+.linkbtn2{
+    grid-row-start: 3;
+    grid-row-end: 4;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    height: 40px;
+    width: 30%;
+  
+    background-color: #ffffee;
+    border: 3px #ffba00 solid;
+    border-radius: 45px;
+    font-family: "Inter", sans-serif;
+    font-weight: 650;
+    color: #ffba00;
+    margin-left: 5%;
 }
