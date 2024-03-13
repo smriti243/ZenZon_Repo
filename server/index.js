@@ -2,6 +2,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const UserDetailsModel = require('./models/UserDetails')
+const ChallengeDetailsModel = require("./models/ChallengeDetail")
 
 const app = express()
 app.use(express.json())
@@ -33,6 +34,12 @@ app.post('/login', (req,res) => {
 app.post('/signup',(req,res)=>{
     UserDetailsModel.create(req.body)
     .then(UserDetails => res.json(UserDetails))
+    .catch(err => res.json(err))
+})
+
+app.post('/challenge',(req,res)=>{
+    ChallengeDetailsModel.create(req.body)
+    .then(ChallengeDetails => res.json(ChallengeDetails))
     .catch(err => res.json(err))
 })
 

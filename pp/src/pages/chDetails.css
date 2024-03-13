@@ -18,6 +18,16 @@ body{
     grid-template-columns: 50% 50%;
     grid-template-rows: 5% 35% 60%;
 }
+.chDetailsForm{
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    /* border: 5px black solid; */
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 100%;
+}
 .cName1{
     grid-column-start: 1;
     grid-column-end: 2;
@@ -55,28 +65,28 @@ body{
     -webkit-text-fill-color: #ffffee;
 }
 .chName {
-    grid-column-end: 1;
-    grid-column-start: 2;
-    grid-row-start: 3;
-    grid-row-end: 4;
+    grid-column-start: 1;
+    grid-column-end: 2;
+   grid-row-start: 1;
     height: 44px;
     width: 60%;
-    margin-left: 10%;
-    border-radius: 40px;
-    background-color: #d9d9d9;
+    border-radius: 45px;
     border: 1px black solid;
-    /* margin-top: 30%; */
+    background-color: #d9d9d9;
+    margin-left: 9%;
 }
 
 .chFormat{
     grid-column-start: 1;
     grid-column-end: 2;
-    grid-row-start: 3;
-    grid-row-end: 4;
+    grid-row-start: 1;
+    margin-top: 10%;
+    /* grid-row-start: 3;
+    grid-row-end: 4; */
     height: 44px;
     width: 60%;
-    margin-left: 10%;
-    margin-top: 9%;
+    margin-left: 9%;
+    
     border-radius: 40px;
     background-color: #d9d9d9;
     border: 1px black solid;
@@ -85,12 +95,13 @@ body{
 .chDeadline{
     grid-column-start: 1;
     grid-column-end: 2;
-    grid-row-start: 3;
-    grid-row-end: 4;
+    grid-row-start: 1;
+    /* grid-row-start: 3;
+    grid-row-end: 4; */
     height: 44px;
     width: 60%;
-    margin-left: 10%;
-    margin-top: 18%;
+    margin-left: 9%;
+    margin-top: 20%;
     border-radius: 40px;
     background-color: #d9d9d9;
     border: 1px black solid;
@@ -98,12 +109,13 @@ body{
 .chStakes{
     grid-column-start: 1;
     grid-column-end: 2;
-    grid-row-start: 3;
-    grid-row-end: 4;
+    grid-row-start: 1;
+    /* grid-row-start: 3;
+    grid-row-end: 4; */
     height: 44px;
     width: 60%;
-    margin-left: 10%;
-    margin-top: 27%;
+    margin-left: 9%;
+    margin-top: 30%;
     border-radius: 40px;
     background-color: #d9d9d9;
     border: 1px black solid;
@@ -111,8 +123,9 @@ body{
 .chDescription{
     grid-column-start: 2;
     grid-column-end: 3;
-    grid-row-start: 3;
-    grid-row-end: 4;
+    grid-row-start: 1;
+    /* grid-row-start: 3;
+    grid-row-end: 4; */
     height: 145px;
     width: 60%;
     margin-left: 10%;
@@ -123,8 +136,8 @@ body{
 .ccBTN{
     grid-column-start: 2;
     grid-column-end: 3;
-    grid-row-start: 3;
-    grid-row-end: 4;
+    grid-row-start: 1;
+
     margin-top: 23%;
     height: 42px;
     width: 30%;
@@ -142,7 +155,7 @@ body{
     grid-column-end: 3;
     grid-row-start: 3;
     grid-row-end: 4;
-    margin-top: 23%;
+    margin-top: 27%;
     height: 42px;
     width: 30%;
     margin-top: 30%;
