@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import './chDetails.css'
 import axios from "axios";
+import CodePopup from "../components/CodePopup";
+
 
 function ChallengePage(){
 
@@ -17,6 +19,12 @@ function ChallengePage(){
         .catch(err => console.log(err))
     }
 
+    const [showPopup, setShowPopup] = useState(false);
+      
+        const togglePopup1 = () => {
+          setShowPopup(!showPopup);
+        };
+
     return(
         <div className="WhiteBox">
             <h2 className="cName1">ZENZONE</h2>
@@ -31,8 +39,8 @@ function ChallengePage(){
              >
             </input>
             <label for = "format"></label>
-                <select name="format" className="chFormat" onChange={(e) => setchFormat(e.target.value)}>
-                    <option value="" disabled selected hidden>Challenge Format</option>
+                <select value={chFormat} name="format" className="chFormat" onChange={(e) => setchFormat(e.target.value)}>
+                    <option value="" disabled hidden>Challenge Format</option>
                     <option value="Individual">Individual Challenge</option>
                     <option value="Group">Group Challenge</option>
                 </select>
@@ -62,7 +70,8 @@ function ChallengePage(){
             </input>
             <button className="ccBTN">CREATE CHALLENGE</button>
             </form>
-            <button className="ifBTN">INVITE FRIENDS</button>
+            <button className="ifBTN" onClick={togglePopup1}>INVITE FRIENDS</button>
+            {showPopup && <CodePopup onClose={togglePopup1} />}
         </div>
     )
 }
