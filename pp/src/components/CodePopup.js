@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './CodePopup.css';
 
-function CodePopup({ onClose }) {
+function CodePopup({ onClose, challengeId }) {
     const [code, setCode] = useState('');
+    
 
     useEffect(() => {
         handleGenerateCode();
@@ -27,7 +28,7 @@ function CodePopup({ onClose }) {
         <div className="popup">
             <div className="popup-inner">
                 <h3 className='heading'>INVITE CODE</h3>
-                <p className="ch1"> {code}</p> {/* Display the generated code */}
+                <p className="ch1" > {code}</p> {/* Display the generated code */}
                 <button className="popupbtn" onClick={onClose}>CLOSE</button>
             </div>
         </div>

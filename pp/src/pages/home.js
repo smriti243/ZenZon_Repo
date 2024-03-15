@@ -4,16 +4,22 @@ import Bg from "../components/background";
 import './home.css'
 import img1 from "../components/img1.png";
 import Popup from "../components/popup";
+import EnterCode from "../components/enterCode";
 import { Link } from "react-router-dom";
 import ChallengePage from "./chDetails";
 
 
 function Home() {
-        const [showPopup, setShowPopup] = useState(false);
+        const [showChPopup, setChPopup] = useState(false);
+        const [showJoinPopup, setJoinPopup] = useState(false);
       
         const togglePopup = () => {
-          setShowPopup(!showPopup);
+          setChPopup(!showChPopup);
         };
+
+        const togglePopup2 = () => {
+            setJoinPopup(!showJoinPopup);
+          };
     return(
        <div className="bg">
             <div className="hd">
@@ -27,7 +33,7 @@ function Home() {
             <h3 className="block">JOIN OUR COMMUNITY AND TAKE ON EXCITING NEW CHALLENGES TO PUSH YOURSELF.</h3>
             <Link to="../challenge"><button className="btn1">CREATE A CHALLENGE</button></Link>
             <br />
-            <button className="btn2">JOIN A CHALLENGE</button>
+            <button className="btn2" onClick={togglePopup2}>JOIN A CHALLENGE</button>
             
         </div>
         
@@ -35,7 +41,8 @@ function Home() {
  <div className="trying">
     <img src={img1} className="img" alt="lady"/>
     </div>
-    {showPopup && <Popup onClose={togglePopup} />}
+    {showChPopup && <Popup onClose={togglePopup} />}
+    {showJoinPopup && <EnterCode onClose={togglePopup2} />}
 
        </div>
     )

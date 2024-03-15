@@ -11,18 +11,31 @@ function ChallengePage(){
     const [chDeadline, setchDeadline] = useState()
     const [chStakes, setchStakes] = useState()
     const [chDescription, setchDescription] = useState()
+    const [challengeId, setChallengeId] = useState(null)
 
     const submitChallenge = (e) => {
         e.preventDefault();
         axios.post('http://localhost:3001/challenge',{ chName, chFormat, chDeadline, chStakes, chDescription})
-        .then(result => console.log(result))
+        .then(response => {
+            console.log(response.data); // The created challenge, including its ID
+            setChallengeId(response.data._id); // Capture the challenge ID
+        })
         .catch(err => console.log(err))
     }
 
     const [showPopup, setShowPopup] = useState(false);
       
         const togglePopup1 = () => {
-          setShowPopup(!showPopup);
+            if(chName && chFormat && chDeadline && chStakes && chDescription){
+                if (chFormat === "Group") {
+                    setShowPopup(!showPopup);
+                } else {
+                    alert("Invite codes can only be generated for group challenges.");
+                }
+            }
+            else{
+                alert("Please fill out all fields.");
+            }
         };
 
     return(
@@ -71,7 +84,7 @@ function ChallengePage(){
             <button className="ccBTN">CREATE CHALLENGE</button>
             </form>
             <button className="ifBTN" onClick={togglePopup1}>INVITE FRIENDS</button>
-            {showPopup && <CodePopup onClose={togglePopup1} />}
+            {showPopup && <CodePopup onClose={togglePopup1} challengeId = {challengeId}/>}
         </div>
     )
 }

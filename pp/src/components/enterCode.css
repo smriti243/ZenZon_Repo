@@ -1,0 +1,43 @@
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's above other content */
+  }
+  
+  .popup-inner {
+    grid-template-rows: 10% 90%;
+    background-color: #6d9773;
+    height: 200px;
+    width: 300px;
+    padding: 20px;
+    border-radius: 25px;
+  }
+  .heading{
+    grid-row-start:1 ;
+    grid-row-end: 2;
+    font-family: "Lalezar", sans-serif;
+    font-weight: 600;
+    color: #ffffee;
+  }
+  .popupbtn{
+    background-color: #ffba00;
+    color: #ffffee;
+    border: none;
+    width: 30%;
+    height: 15%;
+    border-radius: 45px;
+    font-family: "Inter", sans-serif;
+    font-weight: 650;
+    font-size: 15px;
+  }
+  .inputcode{
+    
+    z-index: 1000;
+  }

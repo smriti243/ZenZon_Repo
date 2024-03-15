@@ -5,7 +5,9 @@ const ChallengeDetailsSchema = new mongoose.Schema({
     chFormat: String,
     chDeadline: Date,
     chStakes: String,
-    chDescription: String
+    chDescription: String,
+    invideCode: {type : String, unique : true},
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 })
 
 const ChallengeDetailsModel = mongoose.model("challengedetails", ChallengeDetailsSchema)

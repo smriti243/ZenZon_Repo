@@ -3,12 +3,25 @@ const mongoose = require("mongoose")
 const cors = require("cors")
 const UserDetailsModel = require('./models/UserDetails')
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express()
 app.use(express.json())
 app.use(cors())
 
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+    },
+});
+
+
 mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/UserDetails")
+//mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/ChallengeSetails")
 
 app.post('/login', (req,res) => {
     if(!req.body.email) {
@@ -42,6 +55,8 @@ app.post('/challenge',(req,res)=>{
     .then(ChallengeDetails => res.json(ChallengeDetails))
     .catch(err => res.json(err))
 })
+
+
 
 app.listen(3001, ()=>{
     console.log("server is running")

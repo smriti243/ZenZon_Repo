@@ -3,20 +3,23 @@ import img from '../assests/WhatsApp Image 2024-03-04 at 11.14.21_67e52370.jpg'
 import { Link } from'react-router-dom';
 import './login.css';
 import axios from 'axios'
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
 
 function LoginPage(){
 
     const navigate = useNavigate();
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
+    const { login } = useAuth();
 
     const handleSubmit = (e) => {
         e.preventDefault()
         axios.post('http://localhost:3001/login',{email, password})
         .then(result => {console.log(result)
             if (result.data === "Success"){
+               login();
                 navigate('/home')
             }
         
