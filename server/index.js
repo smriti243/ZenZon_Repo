@@ -1,6 +1,7 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
+const session = require("express-session")
 const UserDetailsModel = require('./models/UserDetails')
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
 const http = require("http");
@@ -8,8 +9,19 @@ const { Server } = require("socket.io");
 
 const app = express()
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+}))
 
+app.use(session({
+    secret: "IdidnotknowIhadthismuchpower",
+    resave : false,
+    saveUninitialized : false,
+    cookie: { secure: false, httpOnly: true }
+}))
+
+const { v4: uuidv4 } = require('uuid');
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -20,7 +32,12 @@ const io = new Server(server, {
 });
 
 
-mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/UserDetails")
+mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/UserDetails" , 
+{ useNewUrlParser: true,
+ useUnifiedTopology: true })
+.then(() => console.log("MongoDB connected"))
+.catch(err => console.log(err));
+
 //mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/ChallengeSetails")
 
 app.post('/login', (req,res) => {
@@ -51,12 +68,30 @@ app.post('/signup',(req,res)=>{
 })
 
 app.post('/challenge',(req,res)=>{
-    ChallengeDetailsModel.create(req.body)
+
+    const { chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode} = req.body;
+    let challengeData = {
+        chName, 
+        chFormat, 
+        chDeadline, 
+        chStakes, 
+        chDescription
+    };
+
+    // Conditionally add an invite code for group challenges
+    if (generateInviteCode && chFormat === 'Group') {
+        challengeData.inviteCode = uuidv4(); // Generate an invite code
+        console.log(challengeData.inviteCode)
+    }
+
+
+    ChallengeDetailsModel.create(challengeData)
     .then(ChallengeDetails => res.json(ChallengeDetails))
-    .catch(err => res.json(err))
+    .catch(err => {
+        console.error(err); // Log the error to the console for debugging
+        res.status(500).json(err); // Use a 500 status code for server errors
+    });
 })
-
-
 
 app.listen(3001, ()=>{
     console.log("server is running")

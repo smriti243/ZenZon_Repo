@@ -1,59 +1,66 @@
 import React, { useState } from "react";
 import './chDetails.css'
 import axios from "axios";
-import CodePopup from "../components/CodePopup";
+import { useNavigate } from "react-router-dom"; 
 
+axios.defaults.withCredentials = true;
 
 function ChallengePage(){
 
-    const [chName, setchName] = useState()
-    const [chFormat, setchFormat] = useState()
-    const [chDeadline, setchDeadline] = useState()
-    const [chStakes, setchStakes] = useState()
-    const [chDescription, setchDescription] = useState()
-    const [challengeId, setChallengeId] = useState(null)
+const [chName, setChName] = useState(); 
+const [chFormat, setChFormat] = useState();
+const [chDeadline, setChDeadline] = useState();
+const [chStakes, setChStakes] = useState();
+const [chDescription, setChDescription] = useState();
+const navigate = useNavigate();
 
-    const submitChallenge = (e) => {
-        e.preventDefault();
-        axios.post('http://localhost:3001/challenge',{ chName, chFormat, chDeadline, chStakes, chDescription})
-        .then(response => {
-            console.log(response.data); // The created challenge, including its ID
-            setChallengeId(response.data._id); // Capture the challenge ID
-        })
-        .catch(err => console.log(err))
+let challengeSubmit= (e)=>{
+    e.preventDefault();
+    if (chName &&  chFormat && chDeadline && chStakes && chDescription ){
+        axios.post("http://localhost:3001/challenge", {chName, chFormat, chDeadline, chStakes, chDescription})
+        .then(response => { console.log(response)})
+        .catch(err => {console.log(err)})
     }
+    else{
+        alert("Please fill out all fields.")
+    }
+}
 
-    const [showPopup, setShowPopup] = useState(false);
-      
-        const togglePopup1 = () => {
-            if(chName && chFormat && chDeadline && chStakes && chDescription){
-                if (chFormat === "Group") {
-                    setShowPopup(!showPopup);
-                } else {
-                    alert("Invite codes can only be generated for group challenges.");
-                }
-            }
-            else{
-                alert("Please fill out all fields.");
-            }
-        };
+let handleInviteFriends=(e)=>{
+    e.preventDefault();
+    if (chName && chFormat && chDeadline && chStakes && chDescription){
+        if (chFormat === "Group"){
+            axios.post("http://localhost:3001/challenge", {chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode: true})
+            .then(response => { alert("Invite Code : " + response.data.inviteCode)})
+            .catch (err => {console.log(err)})
+           
+            navigate('../lobby')
+        }
+        else{
+            alert("Invite codes can only be generated for group challenges.")
+        }
+    }
+    else{
+        alert("Please fill out all fields.")
+    }
+}
 
     return(
         <div className="WhiteBox">
             <h2 className="cName1">ZENZONE</h2>
             <p className="Create">CREATE</p>
             <p className="Challenge">CHALLENGE</p>
-            <form className="chDetailsForm" onSubmit={submitChallenge}>
+            <form className="chDetailsForm" onSubmit={challengeSubmit} >
             <input 
                 type="text" 
                 className="chName" 
                 placeholder="Challenge Name"
-                onChange={(e)=> setchName(e.target.value)}
-             >
+                onChange={(e)=> setChName(e.target.value)}
+             > 
             </input>
             <label for = "format"></label>
-                <select value={chFormat} name="format" className="chFormat" onChange={(e) => setchFormat(e.target.value)}>
-                    <option value="" disabled hidden>Challenge Format</option>
+                <select name="format" className="chFormat" onChange={(e)=> setChFormat(e.target.value)}>
+                    <option value="" disabled hidden selected>Challenge Format</option>
                     <option value="Individual">Individual Challenge</option>
                     <option value="Group">Group Challenge</option>
                 </select>
@@ -61,10 +68,11 @@ function ChallengePage(){
                 type="date" 
                 className="chDeadline" 
                 placeholder="Challenge Deadline"
-                onChange={(e) => setchDeadline(e.target.value)}>
+                onChange={(e)=> setChDeadline(e.target.value)}
+                >
             </input>
             <label for = "stakes"></label>
-                <select name="stakes" className="chStakes" onChange={(e) => setchStakes(e.target.value)}>
+                <select name="stakes" className="chStakes" onChange={(e)=>setChStakes(e.target.value)}>
                     <option value="stakes" disabled selected hidden>Challenge Stakes</option>
                     <option value="image">Image</option>
                     <option value="money">Money</option>
@@ -79,12 +87,14 @@ function ChallengePage(){
                 type="text" 
                 className="chDescription" 
                 placeholder="Challenge Description"
-                onChange={(e)=> setchDescription(e.target.value)}>
+                onChange={(e)=> setChDescription(e.target.value)}
+                >
             </input>
             <button className="ccBTN">CREATE CHALLENGE</button>
             </form>
-            <button className="ifBTN" onClick={togglePopup1}>INVITE FRIENDS</button>
-            {showPopup && <CodePopup onClose={togglePopup1} challengeId = {challengeId}/>}
+            <button className="ifBTN" onClick={handleInviteFriends}>INVITE FRIENDS</button>
+            
+
         </div>
     )
 }
