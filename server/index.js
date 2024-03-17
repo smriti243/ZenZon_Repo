@@ -2,6 +2,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const session = require("express-session")
+const MongoStore = require("connect-mongo")
 const UserDetailsModel = require('./models/UserDetails')
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
 const http = require("http");
@@ -18,6 +19,7 @@ app.use(session({
     secret: "IdidnotknowIhadthismuchpower",
     resave : false,
     saveUninitialized : false,
+    store: MongoStore.create({mongoUrl: "mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/UserDetails"}),
     cookie: { secure: false, httpOnly: true }
 }))
 
@@ -40,58 +42,58 @@ mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mong
 
 //mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/ChallengeSetails")
 
-app.post('/login', (req,res) => {
-    if(!req.body.email) {
-        return res.status(400).json({message:"Email is required"})
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await UserDetailsModel.findOne({ email: email.toLowerCase() });
+        if (user && user.password === password) {
+            req.session.user = { id: user._id, email: user.email }; // Save user info in session
+            res.json("Success");
+        } else {
+            res.status(401).json("Invalid credentials");
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json("Server error");
     }
-    const {email, password} = req.body;
-    UserDetailsModel.findOne({email:req.body.email.toLowerCase()})
-  .then(user => {
-   if (user){
-    if (user.password === password){
-        res.json("Success")
+});
+
+app.post('/signup', async (req, res) => {
+    try {
+        const user = await UserDetailsModel.create(req.body);
+        res.status(201).json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json(err);
     }
-    else{
-        res.json("Wrong password")
+});
+
+app.post('/challenge', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
     }
-   }
-   else{
-       res.json("User not found")
-   }
-  })
-})
-
-app.post('/signup',(req,res)=>{
-    UserDetailsModel.create(req.body)
-    .then(UserDetails => res.json(UserDetails))
-    .catch(err => res.json(err))
-})
-
-app.post('/challenge',(req,res)=>{
-
-    const { chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode} = req.body;
+    const { chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode } = req.body;
     let challengeData = {
-        chName, 
-        chFormat, 
-        chDeadline, 
-        chStakes, 
-        chDescription
+        chName,
+        chFormat,
+        chDeadline,
+        chStakes,
+        chDescription,
+        createdBy: req.session.user.id // Use user id from session
     };
 
-    // Conditionally add an invite code for group challenges
     if (generateInviteCode && chFormat === 'Group') {
-        challengeData.inviteCode = uuidv4(); // Generate an invite code
-        console.log(challengeData.inviteCode)
+        challengeData.inviteCode = uuidv4();
     }
 
-
-    ChallengeDetailsModel.create(challengeData)
-    .then(ChallengeDetails => res.json(ChallengeDetails))
-    .catch(err => {
-        console.error(err); // Log the error to the console for debugging
-        res.status(500).json(err); // Use a 500 status code for server errors
-    });
-})
+    try {
+        const challengeDetails = await ChallengeDetailsModel.create(challengeData);
+        res.json(challengeDetails);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Failed to create the challenge', error: err });
+    }
+});
 
 app.listen(3001, ()=>{
     console.log("server is running")
