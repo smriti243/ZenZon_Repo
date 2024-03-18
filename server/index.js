@@ -19,7 +19,7 @@ app.use(session({
     secret: "IdidnotknowIhadthismuchpower",
     resave : false,
     saveUninitialized : false,
-    store: MongoStore.create({mongoUrl: "mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/UserDetails"}),
+    store: MongoStore.create({mongoUrl: "mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0"}),
     cookie: { secure: false, httpOnly: true }
 }))
 
@@ -34,7 +34,7 @@ const io = new Server(server, {
 });
 
 
-mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0/UserDetails" , 
+mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0" , 
 { useNewUrlParser: true,
  useUnifiedTopology: true })
 .then(() => console.log("MongoDB connected"))
