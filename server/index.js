@@ -20,7 +20,7 @@ app.use(session({
     resave : false,
     saveUninitialized : false,
     store: MongoStore.create({mongoUrl: "mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0"}),
-    cookie: { secure: false, httpOnly: true }
+    cookie: { secure: false }
 }))
 
 const { v4: uuidv4 } = require('uuid');
@@ -94,6 +94,39 @@ app.post('/challenge', async (req, res) => {
         res.status(500).json({ message: 'Failed to create the challenge', error: err });
     }
 });
+
+// Assuming express setup and necessary imports are done
+
+app.get('/api/challenges', async (req, res) => {
+    // Check if the session exists and has the userId stored
+    if (!req.session || !req.session.user || !req.session.user.id) {
+        console.log('Unauthorized access attempt to /api/challenges');
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+        // Retrieve challenges created by the logged-in user
+        const challenges = await ChallengeDetailsModel.find({
+            createdBy: req.session.user.id
+        }).exec();
+
+        // If no challenges found, you could choose to return an empty array or a message
+        if (!challenges.length) {
+            console.log(`No challenges found for user ${req.session.user.id}`);
+            return res.status(404).json({ message: "No challenges found" });
+        }
+
+        // Return the found challenges
+        console.log(`Found ${challenges.length} challenges for user ${req.session.user.id}`);
+        return res.json(challenges);
+    } catch (err) {
+        // Log the error and return a server error response
+        console.error(`Error fetching challenges for user ${req.session.user.id}:`, err);
+        return res.status(500).json({ message: 'Failed to fetch challenges', error: err.message });
+    }
+});
+
+
 
 app.listen(3001, ()=>{
     console.log("server is running")

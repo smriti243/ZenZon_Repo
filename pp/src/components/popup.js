@@ -1,14 +1,31 @@
-// Popup.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './popup.css';
 
+axios.defaults.withCredentials= true;
+
 function Popup({ onClose }) {
+  const [challenges, setChallenges] = useState([]);
+
+  useEffect(() => {
+    // Replace the URL with your actual endpoint URL
+    axios.get('http://localhost:3001/api/challenges')
+      .then(response => {
+        console.log(response.data);
+        setChallenges(response.data);
+      })
+      .catch(error => {
+        console.error("There was an error fetching the challenges:", error);
+      });
+  }, []);
+
   return (
     <div className="popup">
       <div className="popup-inner">
         <h3 className='heading'>RUNNING CHALLENGES</h3>
-        <p className="ch1">Challenge 1</p>
-        <p className="ch2">Challenge 2</p>
+        {challenges.map(challenge => (
+          <p key={challenge._id}>{challenge.chName}</p>
+        ))}
         <button className="popupbtn" onClick={onClose}>CLOSE</button>
       </div>
     </div>
