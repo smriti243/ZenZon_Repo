@@ -17,9 +17,15 @@ const navigate = useNavigate();
 let challengeSubmit= (e)=>{
     e.preventDefault();
     if (chName &&  chFormat && chDeadline && chStakes && chDescription ){
+       if (chFormat === "Individual"){
         axios.post("http://localhost:3001/challenge", {chName, chFormat, chDeadline, chStakes, chDescription})
         .then(response => { console.log(response)})
         .catch(err => {console.log(err)})
+        navigate('/checkpoint')
+       }
+       else {
+        alert("Press Invite Friends for group challenges")
+       }
     }
     else{
         alert("Please fill out all fields.")

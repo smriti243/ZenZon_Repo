@@ -24,13 +24,15 @@
     grid-row-start:1 ;
     grid-row-end: 2;
     color: #6D9773;
+    margin-top: -6px;
 }
 .signup{
     font-family: "Lalezar", system-ui;
     margin-right: 5px;
     grid-column-start: 4;
     grid-column-end: 5;
-    margin-left: 100px;
+    /* margin-left: 100px; */
+    margin-top: -6px;
     font-weight:600;
     grid-row-start:1 ;
     grid-row-end: 2;
@@ -42,6 +44,11 @@
     grid-column-start:4 ;
     grid-column-end: 5;
     grid-row-start: 1;
+    /* border: 5px black solid; */
+    width: 30%;
+    height: 10%;
+    margin-top: 11%;
+    margin-left: 0%;
 }
 .LinkStyle_header_signup{
     text-decoration: none;
@@ -49,4 +56,30 @@
     grid-column-start:4 ;
     grid-column-end: 5; 
     grid-row-start: 1;
+    width: 30%;
+    height: 10%;
+    margin-top: 11%;
+    margin-left: 45%;
+    /* border: 5px black solid; */
+}
+.profile{
+    grid-column-start:4 ;
+    grid-column-end: 5;
+    font-weight: 600;
+    font-family: "Lalezar", system-ui;
+    grid-row-start:1 ;
+    grid-row-end: 2;
+    color: #6D9773;
+    margin-top: -6px;
+}
+.challenges{
+    font-family: "Lalezar", system-ui;
+    margin-right: 5px;
+    grid-column-start: 4;
+    grid-column-end: 5;
+    /* margin-left: 100px; */
+    font-weight:600;
+    grid-row-start:1 ;
+    grid-row-end: 2;
+    color: #6D9773;
 }

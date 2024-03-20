@@ -1,5 +1,6 @@
 const express = require("express")
 const mongoose = require("mongoose")
+const path = require("path")
 const cors = require("cors")
 const session = require("express-session")
 const MongoStore = require("connect-mongo")
@@ -20,7 +21,7 @@ app.use(session({
     resave : false,
     saveUninitialized : false,
     store: MongoStore.create({mongoUrl: "mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0"}),
-    cookie: { secure: false }
+    cookie: { secure: false,maxAge: 3600 * 24 *1000}
 }))
 
 const { v4: uuidv4 } = require('uuid');
@@ -126,6 +127,11 @@ app.get('/api/challenges', async (req, res) => {
     }
 });
 
+app.use(express.static(path.join(__dirname, 'build'))); // Serve static files from the React app build directory
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html')); // Always return the main index.html, so react-router renders the route in the client
+});
 
 
 app.listen(3001, ()=>{

@@ -7,6 +7,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import Home from '../pages/home';
 import ChallengePage from '../pages/chDetails';
 import Lobby from '../pages/lobby';
+import Checkpoint from '../pages/checkpoint';
 import SignupPage from '../pages/signup'; 
 import LoginPage from '../pages/login';
 import Profile from '../pages/profile';
@@ -23,6 +24,7 @@ function App() {
              <Route path="/signup" element={<SignupPage />} />
              <Route path="/login" element={<LoginPage />} />
              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+             <Route path="/checkpoint" element={<ProtectedRoute><Checkpoint /></ProtectedRoute>} />
             </Routes>
         </AuthProvider>
         
