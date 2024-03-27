@@ -6,6 +6,8 @@ const session = require("express-session")
 const MongoStore = require("connect-mongo")
 const UserDetailsModel = require('./models/UserDetails')
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
+const CheckpointDetailsSchema = require("./models/CheckpointDetail")
+const VotingDetailsModel = require("./models/VotingDetails")
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -28,10 +30,19 @@ const { v4: uuidv4 } = require('uuid');
 
 const server = http.createServer(app);
 const io = new Server(server, {
+    path: '/socket.io',
     cors: {
         origin: "http://localhost:3000",
         methods: ["GET", "POST"],
+        credentials: true,
     },
+});
+
+io.on('connection', (socket) => {
+    console.log('A user connected');
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
 });
 
 
@@ -98,6 +109,44 @@ app.post('/challenge', async (req, res) => {
 
 // Assuming express setup and necessary imports are done
 
+// Add this endpoint to your server-side code
+app.get('/api/session', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    // Assuming the user's ID is stored in the session under 'user.id'
+    const userId = req.session.user.id;
+    res.json({ userId });
+});
+
+// Add this endpoint to your Express app
+app.post('/api/submitVote', async (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { vote } = req.body;
+    const userId = req.session.user.id;
+
+    try {
+        await VotingDetailsModel.create({ userId, vote });
+
+        // After saving the vote, calculate the new vote counts
+        const yesVotesCount = await VotingDetailsModel.countDocuments({ vote: 'yes' });
+        const noVotesCount = await VotingDetailsModel.countDocuments({ vote: 'no' });
+
+        // Emit the updated vote counts to all clients
+        io.emit('voteUpdate', { yes: yesVotesCount, no: noVotesCount });
+
+        res.json({ message: "Vote submitted successfully" });
+    } catch (error) {
+        console.error('Failed to submit vote:', error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
+
+
 app.get('/api/challenges', async (req, res) => {
     // Check if the session exists and has the userId stored
     if (!req.session || !req.session.user || !req.session.user.id) {
@@ -127,13 +176,13 @@ app.get('/api/challenges', async (req, res) => {
     }
 });
 
-app.use(express.static(path.join(__dirname, 'build'))); // Serve static files from the React app build directory
+// app.use(express.static(path.join(__dirname, 'build'))); // Serve static files from the React app build directory
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html')); // Always return the main index.html, so react-router renders the route in the client
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html')); // Always return the main index.html, so react-router renders the route in the client
+// });
 
 
-app.listen(3001, ()=>{
+server.listen(3001, ()=>{
     console.log("server is running")
 })

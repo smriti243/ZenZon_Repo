@@ -24,8 +24,9 @@ function Home() {
        <div className="bg">
             <div className="hd">
             <h2 className="cName">ZENZONE</h2>
-            <Link to = "../checkpoint"><h3 className="profile">PROFILE</h3></Link>
+            <Link className="LinkStyle_profile" to = "../checkpoint"><h3 className="profile">PROFILE</h3></Link>
             <h3 className="challenges" onClick={togglePopup}>CHALLENGES</h3>
+            <Link to ="../voting"><h3 className="vote">VOTE</h3></Link>
         </div>
         <div className="txt">
             <p className="challenge">CHALLENGE</p>

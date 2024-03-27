@@ -69,6 +69,8 @@
     font-family: "Lalezar", system-ui;
     grid-row-start:1 ;
     grid-row-end: 2;
+    grid-column-start: 3;
+    grid-column-end: 4;
     color: #6D9773;
     margin-top: -6px;
 }
@@ -82,4 +84,10 @@
     grid-row-start:1 ;
     grid-row-end: 2;
     color: #6D9773;
+}
+.LinkStyle_profile{
+    border: 5px black solid;
+    width: 10%;
+    height: 10%;
+    margin-left: 5px;
 }

@@ -5,6 +5,7 @@ import { AuthProvider } from '../contexts/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 import Home from '../pages/home';
+import Voting from '../pages/voting';
 import ChallengePage from '../pages/chDetails';
 import Lobby from '../pages/lobby';
 import Checkpoint from '../pages/checkpoint';
@@ -25,6 +26,7 @@ function App() {
              <Route path="/login" element={<LoginPage />} />
              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
              <Route path="/checkpoint" element={<ProtectedRoute><Checkpoint /></ProtectedRoute>} />
+             <Route path="/voting" element={<ProtectedRoute><Voting /></ProtectedRoute>} />
             </Routes>
         </AuthProvider>
         
