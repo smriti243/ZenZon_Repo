@@ -8,6 +8,7 @@ const UserDetailsModel = require('./models/UserDetails')
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
 const CheckpointDetailsSchema = require("./models/CheckpointDetail")
 const VotingDetailsModel = require("./models/VotingDetails")
+const BlogpostDetailModel = require("./models/BlogpostDetail"); // Adjust the path according to your structure
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -59,7 +60,7 @@ app.post('/login', async (req, res) => {
     try {
         const user = await UserDetailsModel.findOne({ email: email.toLowerCase() });
         if (user && user.password === password) {
-            req.session.user = { id: user._id, email: user.email }; // Save user info in session
+            req.session.user = { id: user._id, email: user.email, username: user.username }; // Save user info in session
             res.json("Success");
         } else {
             res.status(401).json("Invalid credentials");
@@ -152,10 +153,6 @@ app.post('/api/submitVote', async (req, res) => {
     }
 });
 
-
-
-
-
 app.get('/api/challenges', async (req, res) => {
     // Check if the session exists and has the userId stored
     if (!req.session || !req.session.user || !req.session.user.id) {
@@ -184,6 +181,28 @@ app.get('/api/challenges', async (req, res) => {
         return res.status(500).json({ message: 'Failed to fetch challenges', error: err.message });
     }
 });
+
+app.post('/submit-blog-post', async (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { content } = req.body;
+    // Ensure you're fetching the username from the session correctly
+    // This assumes you're storing it as `req.session.user.username` when the user logs in or signs up
+    const username = req.session.user.username; 
+
+    try {
+        // Make sure to match the variable name with the one you're using to hold the new document
+        const newBlogPost = await BlogpostDetailModel.create({ username, content }); // Corrected variable name
+        res.status(201).json(newBlogPost); // Ensure this matches the variable above
+    } catch (error) {
+        console.error('Failed to submit blog post:', error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
+
 
 // app.use(express.static(path.join(__dirname, 'build'))); // Serve static files from the React app build directory
 
