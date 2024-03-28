@@ -5,14 +5,35 @@
     margin: 50px;
     border-radius: 45px;
     box-shadow: 1px 1px 70px black;
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 600px;
     /* display: grid; 
     grid-template-columns: 50% 50%;
     grid-template-rows: 5% 35% 60%; */
 }
+.postsContainer { 
+    max-height: 500px; /* Adjust based on your needs */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px;
+    /* background: #ffba0f; */
+    margin-left: 5%;
+    margin-top: 2%;
+    height: 370px;
+    width: 90%;
+    border-radius: 45px;
+}
+
+.post {
+    background: #d9d9d9;
+    border-radius: 35px;
+    margin-bottom: 20px; /* Space between posts */
+    padding: 10px;
+}
+
 .blog{
     margin-top: 50px;
     margin-left: 10%;
-    height: 100px;
+    height: 50px;
     width: 70%;
     border-radius: 40px;
     border: 1px solid #000;
