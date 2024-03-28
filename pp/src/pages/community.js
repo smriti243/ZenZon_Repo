@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import io from 'socket.io-client';
 import './community.css';
+
+const socket = io("http://localhost:3001", { withCredentials: true });
 
 function Community() {
     const [content, setContent] = useState('');
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        fetchPosts(); // Fetch posts when the component mounts
+        fetchPosts();
+        socket.on('newBlogPost', () => {
+            console.log('New blog post detected. Fetching latest posts...');
+            fetchPosts(); // Fetch latest posts whenever a new post is submitted
+        });
+
+        // Cleanup on component unmount
+        return () => socket.off('newBlogPost');
     }, []);
 
     const fetchPosts = async () => {

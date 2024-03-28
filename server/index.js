@@ -188,19 +188,18 @@ app.post('/submit-blog-post', async (req, res) => {
     }
 
     const { content } = req.body;
-    // Ensure you're fetching the username from the session correctly
-    // This assumes you're storing it as `req.session.user.username` when the user logs in or signs up
-    const username = req.session.user.username; 
+    const username = req.session.user.username; // Assuming the username is stored in the session
 
     try {
-        // Make sure to match the variable name with the one you're using to hold the new document
-        const newBlogPost = await BlogpostDetailModel.create({ username, content }); // Corrected variable name
-        res.status(201).json(newBlogPost); // Ensure this matches the variable above
+        const newBlogPost = await BlogpostDetailModel.create({ username, content });
+        io.emit('newBlogPost', { message: 'New blog post submitted' }); // Emit an event to all clients
+        res.status(201).json(newBlogPost);
     } catch (error) {
         console.error('Failed to submit blog post:', error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+
 
 // In your server-side code
 app.get('/fetch-blog-posts', async (req, res) => {
