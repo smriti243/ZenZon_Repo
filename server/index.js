@@ -120,18 +120,25 @@ app.get('/api/session', (req, res) => {
 });
 
 // Add this endpoint to your Express app
+// Inside your /api/submitVote endpoint
+
 app.post('/api/submitVote', async (req, res) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { vote } = req.body;
-    const userId = req.session.user.id;
+    const { userId, vote } = req.body;
 
     try {
+        const existingVote = await VotingDetailsModel.findOne({ userId });
+
+        if (existingVote) {
+            return res.status(409).json({ message: "You have already voted" });
+        }
+
         await VotingDetailsModel.create({ userId, vote });
 
-        // After saving the vote, calculate the new vote counts
+        // Calculate the updated vote counts
         const yesVotesCount = await VotingDetailsModel.countDocuments({ vote: 'yes' });
         const noVotesCount = await VotingDetailsModel.countDocuments({ vote: 'no' });
 
@@ -144,6 +151,8 @@ app.post('/api/submitVote', async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+
+
 
 
 

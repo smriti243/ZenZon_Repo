@@ -5,11 +5,10 @@ import './voting.css';
 
 const socket = io("http://localhost:3001", { path: '/socket.io', transports: ["websocket", "polling"] });
 
-
-
 function Voting() {
     const [userId, setUserId] = useState(null);
     const [votes, setVotes] = useState({ yes: 0, no: 0 });
+    const [hasVoted, setHasVoted] = useState(false); // Track if the user has voted
 
     useEffect(() => {
         axios.get('http://localhost:3001/api/session', { withCredentials: true })
@@ -20,38 +19,35 @@ function Voting() {
                 console.error('Error fetching user ID:', error);
             });
 
-        // Listen for vote updates from the server
         socket.on('voteUpdate', (updatedVotes) => {
-            setVotes(updatedVotes); // Update the state with the new vote counts
+            setVotes(updatedVotes);
+            
         });
 
-        // Clean up on component unmount
         return () => {
             socket.off('voteUpdate');
         };
     }, []);
 
     const submitVote = async (vote) => {
-        if (!userId) {
-            console.log('User ID is not set. User might not be logged in.');
+        if (!userId || hasVoted) {
+            console.log('Cannot submit vote.');
             return;
         }
         try {
-            await axios.post('http://localhost:3001/api/submitVote', {
-                userId,
-                vote
-            }, { withCredentials: true });
-            // The vote count update will be handled by the socket event listener
+            await axios.post('http://localhost:3001/api/submitVote', { userId, vote }, { withCredentials: true });
+            setHasVoted(true); // Prevent further voting
         } catch (error) {
             console.error('Error submitting vote:', error);
+            alert('You have already voted.');
         }
     };
 
     return (
         <div className="voting">
             <h1>Are you happy?</h1>
-            <button onClick={() => submitVote('yes')}>Yes ({votes.yes})</button>
-            <button onClick={() => submitVote('no')}>No ({votes.no})</button>
+            <button disabled={hasVoted} onClick={() => submitVote('yes')}>Yes ({votes.yes})</button>
+            <button disabled={hasVoted} onClick={() => submitVote('no')}>No ({votes.no})</button>
         </div>
     );
 }

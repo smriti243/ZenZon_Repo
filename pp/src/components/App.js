@@ -6,6 +6,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 
 import Home from '../pages/home';
 import Voting from '../pages/voting';
+import Community from '../pages/community';
 import ChallengePage from '../pages/chDetails';
 import Lobby from '../pages/lobby';
 import Checkpoint from '../pages/checkpoint';
@@ -27,6 +28,8 @@ function App() {
              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
              <Route path="/checkpoint" element={<ProtectedRoute><Checkpoint /></ProtectedRoute>} />
              <Route path="/voting" element={<ProtectedRoute><Voting /></ProtectedRoute>} />
+             <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
+             
             </Routes>
         </AuthProvider>
         
