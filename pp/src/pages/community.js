@@ -27,6 +27,7 @@ function Community() {
             });
             console.log('Fetched posts:', response.data);
             console.log('Number of posts fetched:', response.data.length); // Correctly log the count
+            // const reversedPosts = response.data.reverse();
             setPosts(response.data); // Update state with fetched posts
         } catch (error) {
             console.error('Failed to fetch posts:', error);

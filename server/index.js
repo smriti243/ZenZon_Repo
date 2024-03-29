@@ -204,7 +204,7 @@ app.post('/submit-blog-post', async (req, res) => {
 // In your server-side code
 app.get('/fetch-blog-posts', async (req, res) => {
     try {
-        const blogPosts = await BlogpostDetailModel.find({}).sort({createdAt: -1}); // Sort by createdAt in descending order
+        const blogPosts = await BlogpostDetailModel.find({}).sort({createdAt:-1}); // Sort by createdAt in descending order
         res.json(blogPosts);
     } catch (error) {
         console.error('Failed to fetch posts:', error);
