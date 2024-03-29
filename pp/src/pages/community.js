@@ -11,7 +11,8 @@ function Community() {
 
     useEffect(() => {
         fetchPosts();
-        socket.on('newBlogPost', () => {
+        socket.on('newBlogPost', (data) => {
+            console.log(data.message); 
             console.log('New blog post detected. Fetching latest posts...');
             fetchPosts(); // Fetch latest posts whenever a new post is submitted
         });
