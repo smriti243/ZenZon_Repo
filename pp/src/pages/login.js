@@ -22,6 +22,9 @@ function LoginPage(){
                login();
                 navigate('/home')
             }
+            else(
+                alert("User Doesn't exist")
+            )
         
         })
         .catch(err => console.log(err))

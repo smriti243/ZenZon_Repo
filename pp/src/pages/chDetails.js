@@ -19,7 +19,12 @@ let challengeSubmit= (e)=>{
     if (chName &&  chFormat && chDeadline && chStakes && chDescription ){
        if (chFormat === "Individual"){
         axios.post("http://localhost:3001/challenge", {chName, chFormat, chDeadline, chStakes, chDescription})
-        .then(response => { console.log(response)})
+        .then(response => { console.log(response)
+        // Assuming the server response includes the challengeId
+        const challengeId = response.data.challengeId;
+        // Store the challengeId in local storage
+        localStorage.setItem('currentChallengeId', challengeId);
+        })
         .catch(err => {console.log(err)})
         navigate('/checkpoint')
        }

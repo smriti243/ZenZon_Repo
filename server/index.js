@@ -6,7 +6,7 @@ const session = require("express-session")
 const MongoStore = require("connect-mongo")
 const UserDetailsModel = require('./models/UserDetails')
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
-const CheckpointDetailsSchema = require("./models/CheckpointDetail")
+const CheckpointDetailsModel = require("./models/CheckpointDetail")
 const VotingDetailsModel = require("./models/VotingDetails")
 const BlogpostDetailModel = require("./models/BlogpostDetail"); // Adjust the path according to your structure
 const http = require("http");
@@ -96,17 +96,54 @@ app.post('/challenge', async (req, res) => {
     };
 
     if (generateInviteCode && chFormat === 'Group') {
-        challengeData.inviteCode = uuidv4();
+        challengeData.inviteCode = uuidv4(); // If needed, generate invite code
     }
 
     try {
         const challengeDetails = await ChallengeDetailsModel.create(challengeData);
-        res.json(challengeDetails);
+        // Respond with the created challenge, including its _id
+        res.json({ challengeId: challengeDetails._id, message: 'Challenge created successfully' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Failed to create the challenge', error: err });
     }
 });
+
+// Define the endpoint to submit checkpoint data
+app.post('/api/checkpoint', async (req, res) => {
+    const { number, description, date, challengeId } = req.body;
+  
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+  
+    try {
+      // Ensure the challenge exists
+      const challengeExists = await ChallengeDetailsModel.findById(challengeId);
+      if (!challengeExists) {
+        return res.status(404).json({ message: "Challenge not found" });
+      }
+  
+      // Create and save the new checkpoint
+      const newCheckpoint = new CheckpointDetailsModel({
+        number,
+        description,
+        date,
+        challenge: challengeId, // Assuming your CheckpointDetailsModel has a field to reference the challenge
+      });
+  
+      await newCheckpoint.save();
+  
+      // Optionally, add the checkpoint to the challenge document
+      // challengeExists.checkpoints.push(newCheckpoint);
+      // await challengeExists.save();
+  
+      res.status(201).json(newCheckpoint);
+    } catch (error) {
+      console.error('Error submitting checkpoint:', error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  });
 
 // Assuming express setup and necessary imports are done
 

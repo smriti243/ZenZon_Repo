@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
 const ChallengeDetailsSchema = new mongoose.Schema({
     chName: String,
     chFormat: String,

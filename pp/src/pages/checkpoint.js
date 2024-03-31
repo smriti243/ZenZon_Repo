@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import './checkpoint.css';
+import axios from "axios"
 
 function Checkpoint() {
+  const challengeId = localStorage.getItem('currentChallengeId');
   const [checkpoints, setCheckpoints] = useState([1]);
   const [selectedCheckpoint, setSelectedCheckpoint] = useState(null);
+  const [checkpointData, setCheckpointData] = useState({ description: "", date: "" });
 
   const addMoreCheckpoints = () => {
     if (checkpoints.length < 5) {
@@ -19,8 +22,42 @@ function Checkpoint() {
 
   const showInput = (index) => {
     setSelectedCheckpoint(index);
+    setCheckpointData({ description: "", date: "" });
   };
 
+  const handleDescriptionChange = (e) => {
+    setCheckpointData({ ...checkpointData, description: e.target.value });
+  };
+
+  const handleDateChange = (e) => {
+    setCheckpointData({ ...checkpointData, date: e.target.value });
+  };
+
+  const submitCheckpointData = async () => {
+    if (!checkpointData.description || !checkpointData.date) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const dataToSend = {
+      number: selectedCheckpoint + 1, // Assuming checkpoint number is 1-indexed
+      description: checkpointData.description,
+      date: checkpointData.date,
+      challengeId, // Assuming you have challengeId stored correctly
+    };
+
+    try {
+      await axios.post('http://localhost:3001/api/checkpoint', dataToSend);
+      alert('Checkpoint submitted successfully');
+      // Reset fields after successful submission
+      setSelectedCheckpoint(null);
+      setCheckpointData({ description: "", date: "" });
+    } catch (error) {
+      console.error('Error submitting checkpoint:', error);
+      alert('Failed to submit checkpoint');
+    }
+  };
+  
   return (
     <div className="checkpointWhiteBox">
       <h1 className="check">CHECK</h1>
@@ -45,6 +82,8 @@ function Checkpoint() {
                 type="text"
                 className="inputDescription"
                 placeholder="Enter description"
+                value={checkpointData.description} 
+                onChange={handleDescriptionChange}
                 style={{
                   gridRowStart: `${1 + index}`,
                   gridColumnStart: "2",
@@ -54,6 +93,8 @@ function Checkpoint() {
               <input
                 type="date"
                 className="inputDate"
+                value={checkpointData.date}
+                onChange={handleDateChange}
                 style={{
                   gridRowStart: `${1 + index}`,
                   gridColumnStart: "3",
@@ -62,6 +103,7 @@ function Checkpoint() {
               />
               <button
                 className="submitDescription"
+                onClick={submitCheckpointData}
                 style={{
                   gridRowStart: `${1 + index}`,
                   gridColumnStart: "4",
