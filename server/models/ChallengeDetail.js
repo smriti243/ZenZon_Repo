@@ -9,7 +9,10 @@ const ChallengeDetailsSchema = new mongoose.Schema({
     chStakes: String,
     chDescription: String,
     inviteCode : {type: String, unique: true, sparse: true},
-    createdBy :{type: Schema.Types.ObjectId, ref: 'User', required: true}
+    createdBy :{type: Schema.Types.ObjectId, ref: 'User', required: true},
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+
+
 })
 
 const ChallengeDetailsModel = mongoose.model("challengedetails", ChallengeDetailsSchema)

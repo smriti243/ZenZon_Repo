@@ -41,10 +41,17 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
     console.log('A user connected');
+
+    socket.on('joinRoom', ({ inviteCode }) => {
+        socket.join(inviteCode);
+        console.log(`A user joined room: ${inviteCode}`);
+    });
+
     socket.on('disconnect', () => {
         console.log('User disconnected');
     });
 });
+
 
 
 mongoose.connect("mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0" , 
@@ -101,11 +108,56 @@ app.post('/challenge', async (req, res) => {
 
     try {
         const challengeDetails = await ChallengeDetailsModel.create(challengeData);
-        // Respond with the created challenge, including its _id
-        res.json({ challengeId: challengeDetails._id, message: 'Challenge created successfully' });
-    } catch (err) {
+        
+        // Construct the response object
+        let responseObject = { 
+            challengeId: challengeDetails._id, 
+            message: 'Challenge created successfully',
+        };
+
+        // If an invite code was generated, include it in the response
+        if (challengeData.inviteCode) {
+            responseObject.inviteCode = challengeData.inviteCode;
+        }
+
+        res.json(responseObject);
+    }  catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Failed to create the challenge', error: err });
+    }
+});
+
+app.post('/api/join-challenge', async (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" }); // Ensure user is logged in
+    }
+
+    const userId = req.session.user.id; // Get user ID from session
+    const { inviteCode } = req.body;
+
+    try {
+        const challenge = await ChallengeDetailsModel.findOne({ inviteCode });
+
+        if (!challenge) {
+            return res.status(404).json({ message: "Challenge not found" });
+        }
+
+        // Check if the user is already a participant
+        if (challenge.participants.includes(userId)) {
+            return res.status(400).json({ message: "User already a participant" });
+        }
+
+        // Add user to participants list and save
+        challenge.participants.push(userId);
+        await challenge.save();
+
+        // Emit an event to the challenge's lobby about the new participant
+        io.to(inviteCode).emit('newParticipant', { userId, challengeId: challenge._id });
+
+        res.json({ message: "Joined challenge successfully", challengeId: challenge._id });
+    } catch (error) {
+        console.error('Error joining challenge:', error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 });
 

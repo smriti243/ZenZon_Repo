@@ -42,7 +42,13 @@ let handleInviteFriends=(e)=>{
     if (chName && chFormat && chDeadline && chStakes && chDescription){
         if (chFormat === "Group"){
             axios.post("http://localhost:3001/challenge", {chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode: true})
-            .then(response => { alert("Invite Code : " + response.data.inviteCode)})
+            .then(response => { alert("Invite Code : " + response.data.inviteCode)
+             // Assuming the server response includes the challengeId
+        const challengeId = response.data.challengeId;
+        // Store the challengeId in local storage
+        localStorage.setItem('currentChallengeId', challengeId);
+        })
+        // })
             .catch (err => {console.log(err)})
            
             navigate('../lobby')

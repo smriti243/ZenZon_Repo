@@ -1,23 +1,41 @@
 import React, { useState } from 'react';
 import './enterCode.css';
-import axios from 'axios'; // Make sure to import axios
+import axios from 'axios'; 
+import { useNavigate } from 'react-router-dom';
 
 function EnterCode({ onClose, onJoinSuccess }) { // Assuming onJoinSuccess is a prop function to handle post-join logic
   const [code2, setCode2] = useState("");
+  const navigate = useNavigate();
+
 
   const handleSubmitCode = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault();
     try {
-      // Replace with the actual endpoint URL and ensure you handle the user ID correctly
-      const response = await axios.post('http://localhost:3001/join-challenge', { inviteCode: code2 });
-      console.log(response.data.message); // Log or display a success message
-      onJoinSuccess(response.data.challengeId); // Handle successful join, e.g., redirect or close popup
+      const response = await axios.post('http://localhost:3001/api/join-challenge', { inviteCode:code2}, { withCredentials: true });
+      console.log(response.data.message);
+      
+      // Assuming the server responds with the challengeId that the user joined
+      if(response.data.challengeId) {
+        // Store the challengeId in local storage
+        localStorage.setItem('currentChallengeId', response.data.challengeId);
+        
+        // Execute the onJoinSuccess callback, passing the challengeId
+        if (onJoinSuccess) {
+          onJoinSuccess(response.data.challengeId);
+        }
+        
+        // Redirect or perform another action to move the user to the lobby or relevant page
+        navigate(`/lobby`); // Adjust the navigation path as needed
+        onClose(); // Assuming onClose is meant to close the popup
+      } else {
+        alert("Failed to get challenge details. Please try again.");
+      }
     } catch (error) {
-      // Handle errors, such as showing an alert or updating the UI with the error message
       console.error("Failed to join the challenge:", error.response?.data?.message || error.message);
       alert(error.response?.data?.message || "Error joining challenge.");
     }
   };
+
 
   return (
     <div className="popup">
