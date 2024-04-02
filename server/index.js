@@ -4,6 +4,8 @@ const path = require("path")
 const cors = require("cors")
 const session = require("express-session")
 const MongoStore = require("connect-mongo")
+const bcrypt = require('bcrypt');
+
 const UserDetailsModel = require('./models/UserDetails')
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
 const CheckpointDetailsModel = require("./models/CheckpointDetail")
@@ -66,12 +68,15 @@ app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await UserDetailsModel.findOne({ email: email.toLowerCase() });
-        if (user && user.password === password) {
-            req.session.user = { id: user._id, email: user.email, username: user.username }; // Save user info in session
-            res.json("Success");
-        } else {
-            res.status(401).json("Invalid credentials");
+        if (user) {
+            // Compare the provided password with the hashed password stored in the database
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            if (passwordMatch) {
+                req.session.user = { id: user._id, email: user.email, username: user.username }; // Save user info in session
+                return res.json("Success");
+            }
         }
+        res.status(401).json("Invalid credentials");
     } catch (err) {
         console.error(err);
         res.status(500).json("Server error");
@@ -80,11 +85,28 @@ app.post('/login', async (req, res) => {
 
 app.post('/signup', async (req, res) => {
     try {
-        const user = await UserDetailsModel.create(req.body);
-        res.status(201).json(user);
+        const { email, password } = req.body;
+        
+        // Check if the user already exists
+        const existingUser = await UserDetailsModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10); // 10 is the saltRounds
+
+        // Create the user with the hashed password
+        const newUser = await UserDetailsModel.create({
+            email,
+            password: hashedPassword,
+            // Add other user properties if needed
+        });
+
+        res.status(201).json(newUser);
     } catch (err) {
         console.error(err);
-        res.status(500).json(err);
+        res.status(500).json({ message: 'Server error', error: err });
     }
 });
 

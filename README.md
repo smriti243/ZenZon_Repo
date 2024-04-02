@@ -10,7 +10,7 @@ As you can see there are 3 folders in this repo namely:
 1. Clone this repo to your local system.
 2. Open terminal and navigate to 'pp' folder then run the following command - npm install react-router-dom zxcvbn axios socket.io-client uuid
 3. After this run - npm start
-4. Now navigate to 'server' folder then run the following command - npm install express mongoose cors nodemon socket.io uuid express-session
+4. Now navigate to 'server' folder then run the following command - npm install express mongoose cors nodemon socket.io uuid express-session bcrypt
 5. After this run - npm start
 6. The project is now running!
 
