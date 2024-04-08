@@ -9,7 +9,7 @@ function Popup({ onClose }) {
 
   useEffect(() => {
     // Replace the URL with your actual endpoint URL
-    axios.get('http://localhost:3001/api/challenges')
+    axios.get('http://localhost:3001/api/running-challenges')
       .then(response => {
         console.log(response.data);
         setChallenges(response.data);

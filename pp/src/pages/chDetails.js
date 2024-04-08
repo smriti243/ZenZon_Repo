@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import './chDetails.css'
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; 
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:3001', { withCredentials: true });
 
 axios.defaults.withCredentials = true;
 
@@ -37,30 +40,46 @@ let challengeSubmit= (e)=>{
     }
 }
 
-let handleInviteFriends=(e)=>{
+let handleInviteFriends = (e) => {
     e.preventDefault();
-    if (chName && chFormat && chDeadline && chStakes && chDescription){
-        if (chFormat === "Group"){
-            axios.post("http://localhost:3001/challenge", {chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode: true})
-            .then(response => { alert("Invite Code : " + response.data.inviteCode)
-             // Assuming the server response includes the challengeId
-        const challengeId = response.data.challengeId;
-        // Store the challengeId in local storage
-        localStorage.setItem('currentChallengeId', challengeId);
-        })
-        // })
-            .catch (err => {console.log(err)})
-           
-            navigate('../lobby')
+    if (chName && chFormat && chDeadline && chStakes && chDescription) {
+        if (chFormat === "Group") {
+            axios.post("http://localhost:3001/challenge", {
+                chName,
+                chFormat,
+                chDeadline,
+                chStakes,
+                chDescription,
+                generateInviteCode: true
+            })
+            .then(async (response) => {
+                alert("Invite Code : " + response.data.inviteCode);
+                const challengeId = response.data.challengeId;
+                // Store the challengeId in local storage
+                localStorage.setItem('currentChallengeId', challengeId);
+                try {
+                    // Join the lobby using WebSockets
+                    const socket = io('http://localhost:3001', { withCredentials: true });
+                    socket.emit('joinRoom', { challengeId });
+                    // Navigate to the lobby after successfully joining
+                    navigate('../lobby');
+                } catch (error) {
+                    console.error('Error joining lobby:', error);
+                    // Handle error joining lobby, if needed
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                alert("Failed to create the challenge.");
+            });
+        } else {
+            alert("Invite codes can only be generated for group challenges.");
         }
-        else{
-            alert("Invite codes can only be generated for group challenges.")
-        }
+    } else {
+        alert("Please fill out all fields.");
     }
-    else{
-        alert("Please fill out all fields.")
-    }
-}
+};
+
 
     return(
         <div className="WhiteBox">

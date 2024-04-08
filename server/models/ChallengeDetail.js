@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+const UserDetailsModel = require('./UserDetails')
 
 const ChallengeDetailsSchema = new mongoose.Schema({
     chName: String,
@@ -9,8 +9,8 @@ const ChallengeDetailsSchema = new mongoose.Schema({
     chStakes: String,
     chDescription: String,
     inviteCode : {type: String, unique: true, sparse: true},
-    createdBy :{type: Schema.Types.ObjectId, ref: 'User', required: true},
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    createdBy :{type: Schema.Types.ObjectId, ref: 'userdetails', required: true},
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userdetails' }]
 
 
 })

@@ -6,7 +6,7 @@ const session = require("express-session")
 const MongoStore = require("connect-mongo")
 const bcrypt = require('bcrypt');
 
-const UserDetailsModel = require('./models/UserDetails')
+const UserDetailsModel = require("./models/UserDetails")
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
 const CheckpointDetailsModel = require("./models/CheckpointDetail")
 const VotingDetailsModel = require("./models/VotingDetails")
@@ -25,7 +25,12 @@ app.use(session({
     secret: "IdidnotknowIhadthismuchpower",
     resave : false,
     saveUninitialized : false,
-    store: MongoStore.create({mongoUrl: "mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0"}),
+    store: new MongoStore({
+        mongoUrl:"mongodb+srv://500096396:48R11d4cbL3iIFpv@zenzone0.d4uvypw.mongodb.net/?retryWrites=true&w=majority&appName=ZenZone0",
+        mongooseConnection: mongoose.connection, // Reuse the existing Mongoose connection
+        collection: 'sessions' // Optional, specify the session collection name
+    })
+    ,
     cookie: { secure: false,maxAge: 3600 * 24 *1000}
 }))
 
@@ -41,18 +46,36 @@ const io = new Server(server, {
     },
 });
 
+// Inside the connection event handler in your WebSocket setup
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    socket.on('joinRoom', ({ inviteCode }) => {
-        socket.join(inviteCode);
-        console.log(`A user joined room: ${inviteCode}`);
+    socket.on('joinRoom', async ({ inviteCode, challengeId }) => {
+        console.log(`User with socket ID ${socket.id} is joining room with invite code ${inviteCode} or challenge ID ${challengeId}`);
+        const roomId = inviteCode || challengeId;
+        if (roomId) {
+            socket.join(roomId);
+            console.log(`User joined room: ${roomId}`);
+            
+            // Fetch participants based on challengeId or inviteCode
+            const challenge = await ChallengeDetailsModel.findOne({ $or: [{ _id: challengeId }, { inviteCode }] });
+            if (challenge) {
+                const participantDetails = await UserDetailsModel.find({ '_id': { $in: challenge.participants }}, 'username');
+                console.log(`Fetched participants for room ${roomId}:`, participantDetails.map(p => p.username));
+                io.to(roomId).emit('updateParticipants', participantDetails.map(p => p.username));
+            } else {
+                console.log('Challenge not found');
+            }
+        } else {
+            console.log('Error: Neither inviteCode nor challengeId was provided');
+        }
     });
 
     socket.on('disconnect', () => {
         console.log('User disconnected');
     });
 });
+
 
 
 
@@ -111,43 +134,46 @@ app.post('/signup', async (req, res) => {
 });
 
 app.post('/challenge', async (req, res) => {
-    if (!req.session.user) {
+    if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
     }
+
     const { chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode } = req.body;
+
     let challengeData = {
         chName,
         chFormat,
         chDeadline,
         chStakes,
         chDescription,
-        createdBy: req.session.user.id // Use user id from session
+        createdBy: req.session.user.id, // ID of the user creating the challenge
+        participants: [req.session.user.id], // Include the creator as the first participant
     };
 
     if (generateInviteCode && chFormat === 'Group') {
-        challengeData.inviteCode = uuidv4(); // If needed, generate invite code
+        challengeData.inviteCode = uuidv4(); // Generate an invite code for group challenges
     }
 
     try {
         const challengeDetails = await ChallengeDetailsModel.create(challengeData);
         
-        // Construct the response object
-        let responseObject = { 
-            challengeId: challengeDetails._id, 
+        // Construct and send the response object
+        const responseObject = { 
+            challengeId: challengeDetails._id,
             message: 'Challenge created successfully',
         };
 
-        // If an invite code was generated, include it in the response
         if (challengeData.inviteCode) {
             responseObject.inviteCode = challengeData.inviteCode;
         }
 
         res.json(responseObject);
-    }  catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Failed to create the challenge', error: err });
+    } catch (error) {
+        console.error('Error creating challenge:', error);
+        res.status(500).json({ message: 'Failed to create the challenge', error: error.message });
     }
 });
+
 
 app.post('/api/join-challenge', async (req, res) => {
     if (!req.session || !req.session.user) {
@@ -173,15 +199,26 @@ app.post('/api/join-challenge', async (req, res) => {
         challenge.participants.push(userId);
         await challenge.save();
 
+        // Fetch participant usernames
+        const participantUsernames = await UserDetailsModel.find({ _id: { $in: challenge.participants } }, 'username');
+
+        // Construct response data including participant usernames
+        const responseData = {
+            message: "Joined challenge successfully",
+            challengeId: challenge._id,
+            participants: participantUsernames.map(user => user.username) // Assuming your UserDetailsModel has a 'username' field
+        };
+
         // Emit an event to the challenge's lobby about the new participant
         io.to(inviteCode).emit('newParticipant', { userId, challengeId: challenge._id });
 
-        res.json({ message: "Joined challenge successfully", challengeId: challenge._id });
-    } catch (error) {
+        res.json(responseData);
+    } catch (error) {   
         console.error('Error joining challenge:', error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+
 
 // Define the endpoint to submit checkpoint data
 app.post('/api/checkpoint', async (req, res) => {
@@ -264,34 +301,99 @@ app.post('/api/submitVote', async (req, res) => {
     }
 });
 
-app.get('/api/challenges', async (req, res) => {
-    // Check if the session exists and has the userId stored
-    if (!req.session || !req.session.user || !req.session.user.id) {
-        console.log('Unauthorized access attempt to /api/challenges');
+// app.post('/api/challenge-details', async (req, res) => {
+//     if (!req.session || !req.session.user) {
+//         return res.status(401).json({ message: "Unauthorized" });
+//     }
+//     const { challengeId } = req.body;
+
+//     try {
+//         const challenge = await ChallengeDetailsModel.findById(challengeId)
+//                               .populate('participants', 'username'); // Ensure 'username' is a valid field in User model
+//         if (!challenge) {
+//             return res.status(404).json({ message: "Challenge not found" });
+//         }
+//         // If challenge is found but participants are null, investigate data integrity and model registration
+//         res.json({
+//             challengeId: challenge._id,
+//             // Include other challenge details
+//             participants: challenge.participants
+//         });// Sends the challenge object with populated participants
+//     } catch (error) {
+//         console.error('Error fetching challenge details:', error);
+//         res.status(500).json({ message: "Server error", error: error.message });
+//     }
+// });
+
+
+// app.post('/api/challenge-details', async (req, res) => {
+//     console.log('Session ID:', req.sessionId);
+//     if (!req.session || !req.session.user) {
+//         return res.status(401).json({ message: "Unauthorized" });
+//     }
+
+//     const { challengeId } = req.body;
+
+//     try {
+//         // Find the challenge by ID and populate the 'participants' field
+//         const challenge = await ChallengeDetailsModel.findById(challengeId)
+//             .populate('participants', 'username') // Assuming your User model has a 'username' field
+//             .exec();
+
+//         if (!challenge) {
+//             return res.status(404).json({ message: "Challenge not found" });
+//         }
+
+//         // Respond with challenge details including participant usernames
+//         res.json({
+//             challengeId: challenge._id,
+//             chName: challenge.chName,
+//             chFormat: challenge.chFormat,
+//             chDeadline: challenge.chDeadline,
+//             chStakes: challenge.chStakes,
+//             chDescription: challenge.chDescription,
+//             participants: challenge.participants.map(participant => participant.username)
+//         });
+//     } catch (error) {
+//         console.error('Error fetching challenge details:', error);
+//         res.status(500).json({ message: "Server error", error: error.message });
+//     } 
+// });
+
+app.post('/api/challenge-details', async (req, res) => {
+    if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    try {
-        // Retrieve challenges created by the logged-in user
-        const challenges = await ChallengeDetailsModel.find({
-            createdBy: req.session.user.id
-        }).exec();
+    const { challengeId } = req.body;
 
-        // If no challenges found, you could choose to return an empty array or a message
-        if (!challenges.length) {
-            console.log(`No challenges found for user ${req.session.user.id}`);
-            return res.status(404).json({ message: "No challenges found" });
+    try {
+        // Find the challenge by ID and populate the 'participants' field
+        const challenge = await ChallengeDetailsModel.findById(challengeId)
+            .populate({path:'participants', 
+                       select: 'username'}) // Assuming your User model has a 'username' field
+            .exec();
+
+        if (!challenge) {
+            return res.status(404).json({ message: "Challenge not found" });
         }
 
-        // Return the found challenges
-        console.log(`Found ${challenges.length} challenges for user ${req.session.user.id}`);
-        return res.json(challenges);
-    } catch (err) {
-        // Log the error and return a server error response
-        console.error(`Error fetching challenges for user ${req.session.user.id}:`, err);
-        return res.status(500).json({ message: 'Failed to fetch challenges', error: err.message });
-    }
+        // Respond with challenge details including participant usernames
+        res.json({
+            challengeId: challenge._id,
+            chName: challenge.chName,
+            chFormat: challenge.chFormat,
+            chDeadline: challenge.chDeadline,
+            chStakes: challenge.chStakes,
+            chDescription: challenge.chDescription,
+            participants: challenge.participants // Directly send the populated participants
+        });
+    } catch (error) {
+        console.error('Error fetching challenge details:', error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    } 
 });
+
 
 app.post('/submit-blog-post', async (req, res) => {
     if (!req.session || !req.session.user) {
