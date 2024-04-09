@@ -57,7 +57,7 @@ function Lobby() {
                         </div>
                     );
                 }
-                return null; // Or handle null participants differently if needed
+                return null; // Or handle null participants differeetly if needed
             })}
         </div>
     );

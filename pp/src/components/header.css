@@ -17,22 +17,22 @@
     color: #6D9773;
 }
 .login{
-    grid-column-start:4 ;
-    grid-column-end: 5;
+    grid-column-start:3 ;
+    grid-column-end: 4;
     font-weight: 600;
     font-family: "Lalezar", system-ui;
     grid-row-start:1 ;
     grid-row-end: 2;
     color: #6D9773;
-    margin-top: -6px;
+    margin-top: 10px;
 }
 .signup{
     font-family: "Lalezar", system-ui;
     margin-right: 5px;
-    grid-column-start: 4;
-    grid-column-end: 5;
+    grid-column-start: 3;
+    grid-column-end: 4;
     /* margin-left: 100px; */
-    margin-top: -6px;
+    margin-top: 10px;
     font-weight:600;
     grid-row-start:1 ;
     grid-row-end: 2;
@@ -41,25 +41,25 @@
 .LinkStyle_header_login{
     text-decoration: none;
     color: #6D9773;
-    grid-column-start:4 ;
-    grid-column-end: 5;
+    grid-column-start:3 ;
+    grid-column-end: 4;
     grid-row-start: 1;
     /* border: 5px black solid; */
     width: 30%;
     height: 10%;
-    margin-top: 11%;
-    margin-left: 0%;
+    /* margin-top: 11%; */
+    margin-left: 55%;
 }
 .LinkStyle_header_signup{
     text-decoration: none;
     color: #6D9773;
-    grid-column-start:4 ;
-    grid-column-end: 5; 
+    grid-column-start:3 ;
+    grid-column-end: 4; 
     grid-row-start: 1;
     width: 30%;
     height: 10%;
-    margin-top: 11%;
-    margin-left: 45%;
+    /* margin-top: 11%; */
+    margin-left: 75%;
     /* border: 5px black solid; */
 }
 .profile{
