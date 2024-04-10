@@ -1,7 +1,7 @@
 .profilePageWhiteBox{
     display: grid;
-    grid-template-rows: 10% 20% 70%;
-    /* grid-template-columns: 40% 20% 40%; */
+    grid-template-rows: 10% 10% 80%;
+    grid-template-columns: 40% 20% 40%;
     height: 600px;
     width: 40%;
     margin-top: 4%;
@@ -15,10 +15,57 @@
     border: 5px solid black;
     grid-row-start: 2;
     grid-row-end: 3;
-    /* grid-column-start: 2;
-    grid-column-end: 3; */
+    grid-column-start: 2;
+    grid-column-end: 3;
     
     height: 100px;
     width: 100px;
     border-radius: 60px;
+}
+.profileField{
+    grid-row-start: 3;
+    grid-row-end: 4;
+    /* border: 5px black solid; */
+    grid-column-start: 1;
+    grid-column-end: 4;
+    height: 400px;    
+    display: grid;
+    grid-template-columns: 20% 60% 20%;
+}
+.usernamePP{
+    border: 5px black solid;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    height: 40px;
+    margin-top: 45px;
+}
+
+.emailPP{
+    border: 5px black solid;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    height: 40px;
+    margin-top: -50px;
+}
+
+.passwordPP{
+    border: 5px black solid;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    height: 40px;
+    margin-top: -50px;
+}
+
+.saveOrEditButton{
+    border: none;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    height: 50px;
+    margin-top: -50px;
+    border-radius:45px;
+    background-color: #ffba0f;
+    font-family: "Inter", sans-serif;
+    font-weight: 650;
+    font-size: 20px;
+    color: #ffffee;
 }

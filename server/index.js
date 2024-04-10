@@ -95,7 +95,7 @@ app.post('/login', async (req, res) => {
             // Compare the provided password with the hashed password stored in the database
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (passwordMatch) {
-                req.session.user = { id: user._id, email: user.email, username: user.username }; // Save user info in session
+                req.session.user = { id: user._id, email: user.email, username: user.username, password: user.password}; // Save user info in session
                 return res.json("Success");
             }
         }
@@ -105,7 +105,7 @@ app.post('/login', async (req, res) => {
         res.status(500).json("Server error");
     }
 });
-
+.
 app.post('/signup', async (req, res) => {
     try {
         const { email, password } = req.body;
