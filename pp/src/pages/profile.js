@@ -1,7 +1,7 @@
 import React from "react";
 import './profile.css';
 import axios from 'axios';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Profile(){
 
@@ -11,7 +11,20 @@ function Profile(){
 
     const [isEditing, setIsEditing] = useState(false);
 
-    
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/api/profilepage', { withCredentials: true });
+                console.log('Fetched user details:', response.data);
+                setUsernameProfilePage(response.data.username || "");
+                setEmailProfilePage(response.data.email || "");
+                setPasswordProfilePage(response.data.password || ""); // Note: Including for your specific request
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+            }
+        };
+        fetchUserDetails();
+    }, []);
 
     const handleUsernameChange = (e)=> setUsernameProfilePage(e.target.value);
     const handleEmailChange = (e)=> setEmailProfilePage(e.target.value);

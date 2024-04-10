@@ -96,6 +96,8 @@ app.post('/login', async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (passwordMatch) {
                 req.session.user = { id: user._id, email: user.email, username: user.username, password: user.password}; // Save user info in session
+                console.log('Session data after login:', req.session.user);
+
                 return res.json("Success");
             }
         }
@@ -105,10 +107,24 @@ app.post('/login', async (req, res) => {
         res.status(500).json("Server error");
     }
 });
-.
+
+app.get('/api/profilepage', (req, res) => {
+    if(!req.session.user){
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    res.json({
+        id: req.session.user.id,
+        email: req.session.user.email,
+        username: req.session.user.username,
+        password: req.session.user.password,    
+    });
+    
+})
+
 app.post('/signup', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { name, username, email, password } = req.body;
         
         // Check if the user already exists
         const existingUser = await UserDetailsModel.findOne({ email });
@@ -121,6 +137,8 @@ app.post('/signup', async (req, res) => {
 
         // Create the user with the hashed password
         const newUser = await UserDetailsModel.create({
+            name,
+            username,
             email,
             password: hashedPassword,
             // Add other user properties if needed
