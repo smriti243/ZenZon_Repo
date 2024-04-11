@@ -30,8 +30,30 @@ function Profile(){
     const handleEmailChange = (e)=> setEmailProfilePage(e.target.value);
     const handlePasswordChange = (e)=> setPasswordProfilePage(e.target.value);
 
-    const toggleEdit = () => setIsEditing(!isEditing);
+    const handleSaveChanges = async () => {
+        try {
+            const response = await axios.put('http://localhost:3001/api/update-userdetails', {
+                username: usernameProfilePage,
+                email: emailProfilePage,
+                password: passwordProfilePage // Caution: Consider security implications
+            }, { withCredentials: true });
+    
+            console.log(response.data.message); // "User details updated successfully"
+            setIsEditing(false); // Exit editing mode
+        } catch (error) {
+            console.error("Error updating user details:", error);
+        }
+    };
+    
 
+    const toggleEdit = () => {
+        if (isEditing) {
+            handleSaveChanges();
+        } else {
+            setIsEditing(true); // Enter editing mode
+        }
+    };
+    
 
 
     return(
@@ -44,7 +66,7 @@ function Profile(){
                 {isEditing ? ( <input type="text" className="emailPP" value={emailProfilePage} onChange={handleEmailChange}></input>)
                 : (<div  className="emailPP">{emailProfilePage}</div> )}
 
-                {isEditing ? ( <input type="text" className="passwordPP" value={passwordProfilePage} onChange={handleUsernameChange}></input>)
+                {isEditing ? ( <input type="text" className="passwordPP" value={passwordProfilePage} onChange={handlePasswordChange}></input>)
                 : (<div  className="passwordPP">{"•".repeat(passwordProfilePage.length)}</div> )}
              
              <button className="saveOrEditButton" onClick={toggleEdit}>{isEditing ? 'SAVE' : 'EDIT'}</button>

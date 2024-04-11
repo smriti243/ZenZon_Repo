@@ -93,7 +93,7 @@ app.post('/login', async (req, res) => {
         const user = await UserDetailsModel.findOne({ email: email.toLowerCase() });
         if (user) {
             // Compare the provided password with the hashed password stored in the database
-            const passwordMatch = await bcrypt.compare(password, user.password);
+            const passwordMatch = await (password, user.password);
             if (passwordMatch) {
                 req.session.user = { id: user._id, email: user.email, username: user.username, password: user.password}; // Save user info in session
                 console.log('Session data after login:', req.session.user);
@@ -122,6 +122,40 @@ app.get('/api/profilepage', (req, res) => {
     
 })
 
+// Update user details
+app.put('/api/update-userdetails', async (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { username, email, password } = req.body;
+    try {
+        const user = await UserDetailsModel.findById(req.session.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update details
+        user.username = username;
+        user.email = email;
+        user.password = password;
+        // if(password) {
+        //     user.password = await bcrypt.hash(password, 10); // Hash new password
+        // }
+
+        await user.save();
+
+        // Update session details
+        req.session.user = { ...req.session.user, username, email, password: user.password };
+
+        res.json({ message: "User details updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
+
 app.post('/signup', async (req, res) => {
     try {
         const { name, username, email, password } = req.body;
@@ -133,14 +167,14 @@ app.post('/signup', async (req, res) => {
         }
 
         // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10); // 10 is the saltRounds
+        // const hashedPassword = await bcrypt.hash(password, 10); 
 
         // Create the user with the hashed password
         const newUser = await UserDetailsModel.create({
             name,
             username,
             email,
-            password: hashedPassword,
+            password,
             // Add other user properties if needed
         });
 
