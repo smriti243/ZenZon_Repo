@@ -5,6 +5,7 @@ const cors = require("cors")
 const session = require("express-session")
 const MongoStore = require("connect-mongo")
 const bcrypt = require('bcrypt');
+const multer = require('multer');
 
 const UserDetailsModel = require("./models/UserDetails")
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
@@ -92,12 +93,15 @@ app.post('/login', async (req, res) => {
     try {
         const user = await UserDetailsModel.findOne({ email: email.toLowerCase() });
         if (user) {
-            // Compare the provided password with the hashed password stored in the database
-            const passwordMatch = await (password, user.password);
-            if (passwordMatch) {
-                req.session.user = { id: user._id, email: user.email, username: user.username, password: user.password}; // Save user info in session
+            // Compare the provided password with the stored password
+            if (password === user.password) {
+                req.session.user = { 
+                    id: user._id, 
+                    email: user.email, 
+                    username: user.username, 
+                    password: user.password 
+                }; // Save user info in session
                 console.log('Session data after login:', req.session.user);
-
                 return res.json("Success");
             }
         }
@@ -108,22 +112,51 @@ app.post('/login', async (req, res) => {
     }
 });
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/profilePicture');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
+
+app.use('/uploads', express.static('uploads'));
+
 app.get('/api/profilepage', (req, res) => {
     if(!req.session.user){
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    res.json({
-        id: req.session.user.id,
-        email: req.session.user.email,
-        username: req.session.user.username,
-        password: req.session.user.password,    
-    });
-    
-})
+    // Retrieve user from database
+    UserDetailsModel.findById(req.session.user.id, 'username email profilePicture password')
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+            // Send back user details including the password (if necessary)
+            res.json({
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                profilePicture: user.profilePicture ? `http://localhost:3001/${user.profilePicture}` : null,
+                password: user.password, // Include password here if necessary
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching user details:", error);
+            res.status(500).json({ message: "Server error", error });
+        });
+});
+
+
 
 // Update user details
-app.put('/api/update-userdetails', async (req, res) => {
+app.put('/api/update-userdetails', upload.single('profilePicture'), async (req, res) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
     }
@@ -136,17 +169,17 @@ app.put('/api/update-userdetails', async (req, res) => {
         }
 
         // Update details
-        user.username = username;
-        user.email = email;
-        user.password = password;
-        // if(password) {
-        //     user.password = await bcrypt.hash(password, 10); // Hash new password
-        // }
+        user.username = username || user.username;
+        user.email = email || user.email;
+        user.password = password || user.password;
+        if (req.file) {
+            user.profilePicture = req.file.path;
+        }
 
         await user.save();
 
         // Update session details
-        req.session.user = { ...req.session.user, username, email, password: user.password };
+        req.session.user = { ...req.session.user, username, email, password: user.password, profilePicture: user.profilePicture };
 
         res.json({ message: "User details updated successfully" });
     } catch (error) {
@@ -154,6 +187,7 @@ app.put('/api/update-userdetails', async (req, res) => {
         res.status(500).json({ message: "Server error", error });
     }
 });
+
 
 
 app.post('/signup', async (req, res) => {
