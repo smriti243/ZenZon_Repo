@@ -22,6 +22,17 @@
     width: 100px;
     border-radius: 60px;
 }
+.dp{
+    /* border: 5px solid black; */
+    grid-row-start: 2;
+    grid-row-end: 3;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    
+    height: 100px;
+    width: 100px;
+    border-radius: 60px;
+}
 .profileField{
     grid-row-start: 3;
     grid-row-end: 4;
