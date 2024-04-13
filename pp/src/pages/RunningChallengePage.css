@@ -22,11 +22,41 @@
     grid-row-end: 2;
 }
 .ChallengeDetailsBox{ 
-    border: 5px black solid;
+    /* border: 5px black solid; */
     grid-column-start: 1;
     grid-column-end: 3;
     grid-row-start: 2;
     grid-row-end: 3;
     margin-left: 5%;
     margin-top: 10%;
+}
+.CheckpointsContainer{
+    /* border: 5px black solid; */
+    grid-row-start: 3;
+    grid-row-end: 4;
+    width: 200%;
+    height: 190px;
+    display: flex;
+    overflow-x: auto; /* Allows horizontal scrolling if items exceed screen width */
+    padding: 10px;
+    gap: 20px; /* This sets the gap between each checkpoint */
+}
+.CheckpointBox {
+    flex: 0 0 auto; /* Flex items won't grow or shrink but will be based on content */
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 200px; /* or any fixed width you prefer */
+    margin-left: 5%; 
+    background-color:#ffba0f ;
+    border-radius:40px;
+    
+}
+.uploadProgressBtn{ 
+    background-color:#ffffee ;
+    border: none;
+    border-radius:40px;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    height: 30px;
+    width: 200px;
 }

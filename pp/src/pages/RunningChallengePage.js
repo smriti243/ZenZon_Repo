@@ -5,18 +5,22 @@ import axios from "axios";
 function RunningChallengePage() {
   
         const [challenge, setChallenge] = useState({});
+        const [checkpoints, setCheckpoints] = useState([]);
         
         useEffect(() => {
             const challengeId = localStorage.getItem('selectedChallengeId');
-            const url = 'http://localhost:3001/api/running-challenge-details/' + challengeId;  // Using string concatenation
+            const url = `http://localhost:3001/api/running-challenge-details/${challengeId}`;
+        
             axios.get(url)
               .then(response => {
-                setChallenge(response.data);
+                setChallenge(response.data.challenge);
+                setCheckpoints(response.data.checkpoints); // Assuming you have a state for checkpoints
               })
               .catch(error => {
                 console.error("Failed to fetch challenge details:", error);
               });
-          }, []);
+        }, []);
+        
       
         return (
           <div className="RunningChallengeWhiteBox">
@@ -29,6 +33,15 @@ function RunningChallengePage() {
            {/* <p>Participants: {challenge.participants.length}</p> */}
            </div>
             {/* Render other challenge details as needed */}
+            <div className="CheckpointsContainer">
+                {checkpoints.map((checkpoint, index) => (
+                    <div key={index} className="CheckpointBox" style={{ marginLeft: `${index * 20}px` }}>
+                        <p>Checkpoint {index + 1}: {checkpoint.description}</p>
+                        <p>Date: {checkpoint.date}</p>
+                        <button className="uploadProgressBtn">UPLOAD PROGRESS</button>
+                    </div>
+                ))}
+            </div>
           </div>
         );
       }

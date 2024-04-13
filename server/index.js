@@ -268,31 +268,29 @@ app.get('/api/running-challenges', async (req, res) => {
 });
 
 app.get('/api/running-challenge-details/:challengeId', async (req, res) => {
-    const { challengeId } = req.params; // Extract the challengeId from the URL parameter
+    const challengeId = req.params.challengeId; // Get challengeId from URL parameters
 
     try {
         const challenge = await ChallengeDetailsModel.findById(challengeId)
-            .populate('participants', 'username email'); // Assuming you want to also return participant details
+            .populate('participants', 'username email'); // Populating participant details
 
         if (!challenge) {
             return res.status(404).json({ message: "Challenge not found" });
         }
 
+        const checkpoints = await CheckpointDetailsModel.find({ challenge: challengeId });
+
         res.json({
-            challengeId: challenge._id,
-            chName: challenge.chName,
-            chFormat: challenge.chFormat,
-            chDeadline: challenge.chDeadline,
-            chStakes: challenge.chStakes,
-            chDescription: challenge.chDescription,
-            createdBy: challenge.createdBy,
-            participants: challenge.participants
+            challenge,
+            checkpoints
         });
     } catch (error) {
-        console.error('Error fetching challenge details:', error);
+        console.error('Error fetching challenge and checkpoints:', error);
         res.status(500).json({ message: "Server error", error });
     }
 });
+
+
 
 app.post('/challenge', async (req, res) => {
     if (!req.session || !req.session.user) {

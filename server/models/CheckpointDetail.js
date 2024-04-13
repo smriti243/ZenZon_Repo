@@ -6,6 +6,7 @@ const CheckpointDetailsSchema = new mongoose.Schema({
     number: Number,
     description: String,
     date: Date,
+    progressImage: String,
     challenge: { type: Schema.Types.ObjectId, ref: 'ChallengeDetailsModel', required: true }
 })
 
