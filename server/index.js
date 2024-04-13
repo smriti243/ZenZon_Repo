@@ -6,6 +6,7 @@ const session = require("express-session")
 const MongoStore = require("connect-mongo")
 const bcrypt = require('bcrypt');
 const multer = require('multer');
+const fs = require('fs');
 
 const UserDetailsModel = require("./models/UserDetails")
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
@@ -320,6 +321,54 @@ app.post('/api/upload-checkpoint-progress', uploadCheckpointImage.single('progre
         res.status(200).json({ message: "Progress image updated successfully", checkpoint });
     } catch (error) {
         console.error('Failed to update checkpoint:', error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
+const challengeCompleteStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        const dir = 'uploads/ChallengeComplete';
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+    },
+    filename: function(req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const uploadChallengeComplete = multer({ storage: challengeCompleteStorage });
+
+app.use('/uploads/ChallengeComplete', express.static(path.join(__dirname, 'uploads', 'ChallengeComplete')));
+
+app.post('/api/challenge-complete/:challengeId', uploadChallengeComplete.single('completionImage'), async (req, res) => {
+    const { challengeId } = req.params;
+
+    if (!req.file) {
+        return res.status(400).json({ message: "No completion image uploaded" });
+    }
+
+    try {
+        const challenge = await ChallengeDetailsModel.findById(challengeId);
+        if (!challenge) {
+            return res.status(404).json({ message: "Challenge not found" });
+        }
+
+        challenge.chCompletionImage = `uploads/ChallengeComplete/${req.file.filename}`; // Update challenge with the path of the completion image
+        await challenge.save();
+
+        res.json({
+            message: 'Challenge completed successfully',
+            challenge: {
+                id: challenge._id,
+                chName: challenge.chName,
+                chCompletionImage: challenge.chCompletionImage
+            }
+        });
+    } catch (error) {
+        console.error('Error completing challenge:', error);
         res.status(500).json({ message: "Server error", error });
     }
 });

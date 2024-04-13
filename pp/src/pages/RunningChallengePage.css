@@ -60,3 +60,14 @@
     height: 30px;
     width: 200px;
 }
+.challengeCompleteBtn{ 
+    background-color:#ffba0f ;
+    color: #ffffee;
+    border: none;
+    border-radius:40px;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    height: 30px;
+    width: 200px;
+
+}

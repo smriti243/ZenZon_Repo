@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
-import './RunningChallengePage.css';
 import axios from "axios";
+import './RunningChallengePage.css';
+import { useNavigate } from "react-router-dom";
 
 function RunningChallengePage() {
+    const navigate = useNavigate();
     const [challenge, setChallenge] = useState({});
     const [checkpoints, setCheckpoints] = useState([]);
     const [selectedFile, setSelectedFile] = useState({});
-  
+    const [completionFile, setCompletionFile] = useState(null);
+
     const handleFileChange = (event, checkpointId) => {
         setSelectedFile({ ...selectedFile, [checkpointId]: event.target.files[0] });
+    };
+
+    const handleCompletionFileChange = (event) => {
+        setCompletionFile(event.target.files[0]);
     };
 
     const handleUploadProgress = async (checkpointId) => {
@@ -27,11 +34,40 @@ function RunningChallengePage() {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
+                
             });
+
             alert('Image uploaded successfully!');
+           
         } catch (error) {
             console.error('Error uploading image:', error);
             alert('Failed to upload image');
+        }
+    };
+
+    const handleChallengeComplete = async () => {
+        if (!completionFile) {
+            alert('No completion file selected!');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('completionImage', completionFile);
+        const challengeId = localStorage.getItem('selectedChallengeId');
+        const url = `http://localhost:3001/api/challenge-complete/${challengeId}`;
+
+        try {
+            await axios.post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+
+            });
+            alert('Completion image uploaded successfully! Your image will be uploade for the community to vote on,');
+            navigate('/home');
+        } catch (error) {
+            console.error('Error uploading completion image:', error);
+            alert('Failed to upload completion image');
         }
     };
 
@@ -55,6 +91,10 @@ function RunningChallengePage() {
                 <p>Deadline: {challenge.chDeadline}</p>
                 <p>Format: {challenge.chFormat}</p>
                 <p>Stakes: {challenge.chStakes}</p>
+                <input type="file" onChange={handleCompletionFileChange} />
+                <button onClick={handleChallengeComplete} className="challengeCompleteBtn">
+                    Challenge Complete
+                </button>
             </div>
             <div className="CheckpointsContainer">
                 {checkpoints.map((checkpoint, index) => (
