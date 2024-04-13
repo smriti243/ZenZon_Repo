@@ -290,6 +290,39 @@ app.get('/api/running-challenge-details/:challengeId', async (req, res) => {
     }
 });
 
+const checkpointImageStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'uploads/CheckpointImages');  // Ensure this directory exists or create it
+    },
+    filename: function(req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const uploadCheckpointImage = multer({ storage: checkpointImageStorage });
+
+app.post('/api/upload-checkpoint-progress', uploadCheckpointImage.single('progressImage'), async (req, res) => {
+    const checkpointId = req.query.checkpointId;
+    if (!req.file) {
+        return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    try {
+        const checkpoint = await CheckpointDetailsModel.findById(checkpointId);
+        if (!checkpoint) {
+            console.log(`No checkpoint found with ID: ${checkpointId}`);
+            return res.status(404).json({ message: "Checkpoint not found" });
+        }
+
+        checkpoint.progressImage = `uploads/CheckpointImages/${req.file.filename}`;
+        await checkpoint.save();
+        res.status(200).json({ message: "Progress image updated successfully", checkpoint });
+    } catch (error) {
+        console.error('Failed to update checkpoint:', error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
 
 
 app.post('/challenge', async (req, res) => {
