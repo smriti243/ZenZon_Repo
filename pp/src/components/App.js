@@ -15,6 +15,7 @@ import LoginPage from '../pages/login';
 import Profile from '../pages/profile';
 import Bg from './background';
 import ImageStake from '../pages/imageStake';
+import RunningChallengePage from '../pages/RunningChallengePage';
 
 function App() {
     return (<div>
@@ -31,6 +32,7 @@ function App() {
              <Route path="/voting" element={<ProtectedRoute><Voting /></ProtectedRoute>} />
              <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
              <Route path="/imageStake" element={<ProtectedRoute><ImageStake /></ProtectedRoute>} />
+             <Route path="/RunningChallengePage" element={<ProtectedRoute><RunningChallengePage /></ProtectedRoute>} />
             </Routes>
         </AuthProvider>
         

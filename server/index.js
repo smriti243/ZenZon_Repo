@@ -267,6 +267,33 @@ app.get('/api/running-challenges', async (req, res) => {
     }
 });
 
+app.get('/api/running-challenge-details/:challengeId', async (req, res) => {
+    const { challengeId } = req.params; // Extract the challengeId from the URL parameter
+
+    try {
+        const challenge = await ChallengeDetailsModel.findById(challengeId)
+            .populate('participants', 'username email'); // Assuming you want to also return participant details
+
+        if (!challenge) {
+            return res.status(404).json({ message: "Challenge not found" });
+        }
+
+        res.json({
+            challengeId: challenge._id,
+            chName: challenge.chName,
+            chFormat: challenge.chFormat,
+            chDeadline: challenge.chDeadline,
+            chStakes: challenge.chStakes,
+            chDescription: challenge.chDescription,
+            createdBy: challenge.createdBy,
+            participants: challenge.participants
+        });
+    } catch (error) {
+        console.error('Error fetching challenge details:', error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
 app.post('/challenge', async (req, res) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
