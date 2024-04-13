@@ -60,30 +60,13 @@
     font-size: 25px;
     color: #ffffee;
 }
-.addmore{
-    grid-column-start: 1;
-    grid-column-end: 2;
+.nextBTN{
+    grid-column-start: 2;
+    grid-column-end: 3;
     grid-row-start: 3;
     height: 50px;
-    width: 50px;
-    margin-left: 8%;
-    border-radius: 50px;
-    text-align: center;
-    line-height: 50px;
-    font-family: "Inter", sans-serif;
-    background-color: #ffba00;
-    font-weight: 1000;
-    font-size: 25px;
-    color: #ffffee;
-    border: none;
-}
-.addmore{
-    grid-column-start: 1;
-    grid-column-end: 2;
-    grid-row-start: 3;
-    height: 50px;
-    width: 50px;
-    margin-left: 8%;
+    width: 100px;
+    margin-left: 58%;
     border-radius: 50px;
     text-align: center;
     line-height: 50px;

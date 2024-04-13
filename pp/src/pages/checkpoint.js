@@ -1,12 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './checkpoint.css';
-import axios from "axios"
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 function Checkpoint() {
+  const navigate = useNavigate();
   const challengeId = localStorage.getItem('currentChallengeId');
   const [checkpoints, setCheckpoints] = useState([1]);
   const [selectedCheckpoint, setSelectedCheckpoint] = useState(null);
   const [checkpointData, setCheckpointData] = useState({ description: "", date: "" });
+  const [stakes, setStakes] = useState('');
+
+  useEffect(() => {
+    // Adjusted function to fetch the chStakes value
+const fetchStakesValue = async () => {
+  try {
+    const url = 'http://localhost:3001/fetching-stakesvalue?challengeId=' + challengeId;
+    const response = await axios.get(url);
+    setStakes(response.data.chStakes); // Correct the property name here
+  } catch (error) {
+    console.error('Failed to fetch stakes value:', error);
+  }
+};
+
+
+    if (challengeId) {
+      fetchStakesValue();
+    }
+  }, [challengeId]);
 
   const addMoreCheckpoints = () => {
     if (checkpoints.length < 5) {
@@ -57,6 +78,17 @@ function Checkpoint() {
       alert('Failed to submit checkpoint');
     }
   };
+
+  const handleNext = () => {
+    if (stakes === 'image') {
+      navigate('/imageStake');
+    } else {
+      // Handle other cases or default navigation
+      alert("Finished setting up the challenge");
+     navigate ('/home');
+    }
+  };
+
   
   return (
     <div className="checkpointWhiteBox">
@@ -119,6 +151,7 @@ function Checkpoint() {
      </div>
       <button className="addmore" onClick={addMoreCheckpoints}>+</button>
       {checkpoints.length > 1 && <button className="subtract" onClick={removeLastCheckpoint}>-</button>}
+      <button className='nextBTN' onClick={handleNext}>NEXT</button>
     </div>
   );
 }

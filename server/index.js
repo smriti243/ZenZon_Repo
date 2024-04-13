@@ -238,6 +238,35 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+app.get('/api/running-challenges', async (req, res) => {
+    // Check if the session exists and has the userId stored
+    if (!req.session || !req.session.user || !req.session.user.id) {
+        console.log('Unauthorized access attempt to /api/challenges');
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+        // Retrieve challenges created by the logged-in user
+        const challenges = await ChallengeDetailsModel.find({
+            createdBy: req.session.user.id
+        }).exec();
+
+        // If no challenges found, you could choose to return an empty array or a message
+        if (!challenges.length) {
+            console.log(`No challenges found for user ${req.session.user.id}`);
+            return res.status(404).json({ message: "No challenges found" });
+        }
+
+        // Return the found challenges
+        console.log(`Found ${challenges.length} challenges for user ${req.session.user.id}`);
+        return res.json(challenges);
+    } catch (err) {
+        // Log the error and return a server error response
+        console.error(`Error fetching challenges for user ${req.session.user.id}:`, err);
+        return res.status(500).json({ message: 'Failed to fetch challenges', error: err.message });
+    }
+});
+
 app.post('/challenge', async (req, res) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -361,7 +390,73 @@ app.post('/api/checkpoint', async (req, res) => {
     }
   });
 
-// Assuming express setup and necessary imports are done
+// Backend endpoint to fetch stakes
+app.get('/fetching-stakesvalue', async (req, res) => {
+    const { challengeId } = req.query; // Extract challengeId from query parameters
+    try {
+      const challenge = await ChallengeDetailsModel.findById(challengeId);
+      if (!challenge) {
+        return res.status(404).json({ message: 'Challenge not found' });
+      }
+      res.json({ chStakes: challenge.chStakes }); // Send the chStakes value
+    } catch (error) {
+      console.error('Error fetching challenge details:', error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  });
+
+  const imageStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'uploads/StakeImages');  // Ensure this directory exists
+    },
+    filename: function(req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const ImageStakeupload = multer({ storage: imageStorage });
+
+app.post('/api/stake-image', ImageStakeupload.single('stakeImage'), async (req, res) => {
+    const challengeId = req.body.challengeId;
+    console.log('Received challengeId:', challengeId); // Confirming challengeId is received
+    if (!req.file) {
+        console.log('No file received');
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+    console.log('File received:', req.file); // Logging file details
+
+    try {
+        const challenge = await ChallengeDetailsModel.findById(challengeId);
+        if (!challenge) {
+            console.log('No challenge found with ID:', challengeId);
+            return res.status(404).json({ message: "Challenge not found" });
+        }
+
+        console.log('Challenge before update:', challenge); // Log challenge details before update
+
+        // Check if challenge has a specific field requirement before updating path
+        if (challenge.chStakes === 'image') {
+            challenge.stakeImagePath = `uploads/StakeImages/${req.file.filename}`;
+            console.log('Updated stakeImagePath to:', challenge.stakeImagePath); // Log the new path
+
+            // Attempt to save the updated challenge document
+            const updatedChallenge = await challenge.save();
+            console.log('Challenge after saving to DB:', updatedChallenge); // Log challenge details after saving
+            res.json({ message: 'Challenge updated successfully', challenge: updatedChallenge });
+        } else {
+            console.log('Challenge stakes type is not Image');
+            res.status(400).json({ message: "Challenge stakes type is not set to Image" });
+        }
+    } catch (error) {
+        console.error('Failed to update challenge:', error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
+
+
+
 
 // Add this endpoint to your server-side code
 app.get('/api/session', (req, res) => {

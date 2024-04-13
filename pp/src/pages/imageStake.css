@@ -1,0 +1,46 @@
+.stakeImage{
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 3;
+
+}
+.imageSubmitBtn{
+    border: 5px black solid;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    width: 120px;
+    height: 50px;
+    margin-left: 8%;
+    border-radius: 50px;
+    text-align: center;
+    line-height: 50px;
+    font-family: "Inter", sans-serif;
+    background-color: #ffba00;
+    font-weight: 1000;
+    font-size: 20px;
+    color: #ffffee;
+    border: none;
+}
+
+.FinishBtn{
+    border: 5px black solid;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    width: 120px;
+    height: 50px;
+    margin-left: 8%;
+    border-radius: 50px;
+    text-align: center;
+    line-height: 50px;
+    font-family: "Inter", sans-serif;
+    background-color: #ffba00;
+    font-weight: 1000;
+    font-size: 20px;
+    color: #ffffee;
+    border: none;
+}

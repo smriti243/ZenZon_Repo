@@ -14,6 +14,7 @@ import SignupPage from '../pages/signup';
 import LoginPage from '../pages/login';
 import Profile from '../pages/profile';
 import Bg from './background';
+import ImageStake from '../pages/imageStake';
 
 function App() {
     return (<div>
@@ -29,7 +30,7 @@ function App() {
              <Route path="/checkpoint" element={<ProtectedRoute><Checkpoint /></ProtectedRoute>} />
              <Route path="/voting" element={<ProtectedRoute><Voting /></ProtectedRoute>} />
              <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
-             
+             <Route path="/imageStake" element={<ProtectedRoute><ImageStake /></ProtectedRoute>} />
             </Routes>
         </AuthProvider>
         

@@ -8,6 +8,7 @@ const ChallengeDetailsSchema = new mongoose.Schema({
     chDeadline: Date,
     chStakes: String,
     chDescription: String,
+    stakeImagePath: String ,
     inviteCode : {type: String, unique: true, sparse: true},
     createdBy :{type: Schema.Types.ObjectId, ref: 'userdetails', required: true},
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'userdetails' }]
