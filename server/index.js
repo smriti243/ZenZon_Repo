@@ -118,14 +118,16 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        let filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+        cb(null, filename); // No need to replace slashes here, it's handled in the response
     }
 });
+
 
 const upload = multer({ storage: storage });
 
 
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads/profilePicture', express.static(path.join(__dirname, 'uploads', 'profilePicture')));
 
 app.get('/api/profilepage', (req, res) => {
     if(!req.session.user){
@@ -138,12 +140,13 @@ app.get('/api/profilepage', (req, res) => {
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
+            const profilePictureUrl = user.profilePicture ? `http://localhost:3001/${user.profilePicture.replace(/\\/g, '/')}` : null;
             // Send back user details including the password (if necessary)
             res.json({
                 id: user._id,
                 email: user.email,
                 username: user.username,
-                profilePicture: user.profilePicture ? `http://localhost:3001/${user.profilePicture}` : null,
+                profilePicture: profilePictureUrl,
                 password: user.password, // Include password here if necessary
             });
         })
@@ -173,15 +176,31 @@ app.put('/api/update-userdetails', upload.single('profilePicture'), async (req, 
         user.email = email || user.email;
         user.password = password || user.password;
         if (req.file) {
-            user.profilePicture = req.file.path;
+            user.profilePicture = req.file.path.replace(/\\/g, '/');
+            console.log("Profile Picture Path:", user.profilePicture);
+
         }
 
         await user.save();
 
+        // After user.save() inside your PUT '/api/update-userdetails' endpoint
+
+
+
         // Update session details
         req.session.user = { ...req.session.user, username, email, password: user.password, profilePicture: user.profilePicture };
+        console.log(user.profilePicture);
 
-        res.json({ message: "User details updated successfully" });
+        res.json({
+            message: "User details updated successfully",
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                profilePicture: user.profilePicture ? `http://localhost:3001/${user.profilePicture}` : null,
+                // Other fields if necessary
+            }
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error", error });

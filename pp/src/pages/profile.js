@@ -8,7 +8,7 @@ function Profile(){
     const [emailProfilePage, setEmailProfilePage] = useState("");
     const [passwordProfilePage, setPasswordProfilePage] = useState("");
     const [profilePicture, setProfilePicture] = useState(null); // State to hold profile picture
-
+    const [previewImage, setPreviewImage] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
@@ -20,10 +20,10 @@ function Profile(){
                 setEmailProfilePage(response.data.email || "");
                 setPasswordProfilePage(response.data.password || ""); // Note: Including for your specific request
                 if (response.data.profilePicture) {
-                    // Assuming that the profilePicture path needs to be complete URL
-                    setProfilePicture(`http://localhost:3001/uploads/profilePicture/${response.data.profilePicture}`);
+                    setProfilePicture(response.data.profilePicture);
                 } else {
                     setProfilePicture(null);
+                    setPreviewImage(null);
                 }
             } catch (error) {
                 console.error("Error fetching user details:", error);
@@ -31,6 +31,7 @@ function Profile(){
         };
         fetchUserDetails();
     }, []);
+    
 
     const handleUsernameChange = (e) => setUsernameProfilePage(e.target.value);
     const handleEmailChange = (e) => setEmailProfilePage(e.target.value);
@@ -39,7 +40,9 @@ function Profile(){
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setProfilePicture(URL.createObjectURL(file));
+            setProfilePicture(file);  // This is for uploading
+            // Also set a state for previewing the image
+            setPreviewImage(URL.createObjectURL(file));
         }
     };
     
@@ -49,7 +52,7 @@ function Profile(){
         formData.append('email', emailProfilePage);
         // Only append the password if it's actually been changed
         if (passwordProfilePage) formData.append('password', passwordProfilePage);
-        if (profilePicture && profilePicture instanceof File) {  // Ensure it's a File object
+        if (profilePicture instanceof File) {  // Ensure it's a File object
             formData.append('profilePicture', profilePicture);
         }
         try {
@@ -60,11 +63,30 @@ function Profile(){
                 withCredentials: true,
             });
 
+            console.log("Server response:", response.data);
             console.log(response.data.message); // "User details updated successfully"
-            console.log(`Image URL: http://localhost:3001/uploads/profilePicture/${profilePicture}`);
-            if (response.data.user && response.data.user.profilePicture) {
-                setProfilePicture(`http://localhost:3001/uploads/profilePicture/${response.data.user.profilePicture}`);
+            console.log(`Image URL: http://localhost:3001/uploads/profilePicture/${response.data.user.profilePicture}`);
+
+            if (response.data && response.data.user && response.data.user.profilePicture) {
+                console.log('User details updated:', response.data.user);
+    
+                // Only update the state if the profile picture path is provided in the response
+                
+                    // const profilePicUrl = response.data.user.profilePicture.includes('http://localhost:3001') ?
+                    //                       response.data.user.profilePicture :
+                    //                       `http://localhost:3001/${response.data.user.profilePicture.replace(/\\/g, '/')}`;
+                    // setProfilePicture(profilePicUrl);
+
+                    setProfilePicture(response.data.user.profilePicture);
+            setPreviewImage(null); 
+
+                
+                                 }
+             else {
+                console.error('Invalid response structure:', response.data);
+                // Optionally reset or handle the undefined case more gracefully
             }
+    
 
             setIsEditing(false); // Exit editing mode
         } catch (error) {
@@ -87,7 +109,8 @@ function Profile(){
             <div className="profileImageCircle">
                 {isEditing ? 
                     <input className="dp" type="file" name="profilePicture" onChange={handleFileChange} /> : 
-                    <img className="dp" src={profilePicture} alt="Profile" />
+                    <img className="dp" src={profilePicture||previewImage} alt="Profile" />
+
                 }
             </div>
             <div className="profileField">
