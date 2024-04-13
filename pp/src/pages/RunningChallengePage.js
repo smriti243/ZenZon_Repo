@@ -19,9 +19,15 @@ function RunningChallengePage() {
           }, []);
       
         return (
-          <div>
-            <h1>{challenge.chName}</h1>
-            <p>{challenge.chDescription}</p>
+          <div className="RunningChallengeWhiteBox">
+            <h1 className="ChallengeName">{challenge.chName}</h1>
+           <div className="ChallengeDetailsBox">
+           <p>Description: {challenge.chDescription}</p>
+           <p>Deadline: {challenge.chDeadline}</p>
+           <p>Format: {challenge.chFormat}</p>
+           <p>Stakes: {challenge.chStakes}</p>
+           {/* <p>Participants: {challenge.participants.length}</p> */}
+           </div>
             {/* Render other challenge details as needed */}
           </div>
         );

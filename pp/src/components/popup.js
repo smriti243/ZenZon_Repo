@@ -24,6 +24,11 @@ function Popup({ onClose }) {
     navigate('/RunningChallengePage'); // Navigate to a generic details page
   };
 
+  const handleClose = () => {
+    localStorage.removeItem('selectedChallengeId'); // Remove the challenge ID from local storage
+    onClose(); // Call the passed onClose function to close the popup
+  };
+
   return (
     <div className="popup">
       <div className="popup-inner">
@@ -33,7 +38,7 @@ function Popup({ onClose }) {
             {challenge.chName}
           </p>
         ))}
-        <button className="popupbtn" onClick={onClose}>CLOSE</button>
+        <button className="popupbtn" onClick={handleClose}>CLOSE</button>
       </div>
     </div>
   );
