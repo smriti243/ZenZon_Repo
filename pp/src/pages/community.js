@@ -7,6 +7,7 @@ const socket = io("http://localhost:3001", { withCredentials: true });
 
 function Community() {
     const [content, setContent] = useState('');
+    const [image, setImage] = useState(null);
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -37,22 +38,33 @@ function Community() {
     
 
     const submitPost = async () => {
-        if (!content) {
-            alert("Please enter some content before submitting.");
+        if (!content && !image) {
+            alert("Please enter some content or select an image before submitting.");
             return;
         }
-
+    
+        const formData = new FormData();
+        formData.append('content', content);
+        if (image) {
+            formData.append('image', image); // Make sure 'image' is being appended correctly
+        }
+    
         try {
-            await axios.post('http://localhost:3001/submit-blog-post', { content }, {
+            const response = await axios.post('http://localhost:3001/submit-blog-post', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
                 withCredentials: true
             });
-            console.log('Post submitted. Refreshing posts...');
+            console.log('Post submitted:', response.data);
             fetchPosts(); // Re-fetch posts to include the new submission
-            setContent(''); // Clear the input field after successful submission
+            setContent(''); // Clear the content input field after successful submission
+            setImage(null); // Clear the image input field after successful submission
         } catch (error) {
             console.error('Failed to submit post:', error);
         }
     };
+    
 
     return (
         <div className="communityPage">
@@ -63,6 +75,7 @@ function Community() {
                     <div key={post._id} className="post">
                         <h3>{post.username}</h3>
                         <p>{post.content}</p>
+                        {post.image && <img className="blogImages" src={`${post.image}?${new Date().getTime()}`} alt="Post" />}
                     </div>
                 )) : <p>No posts to display.</p>}
             </div>
@@ -73,6 +86,11 @@ function Community() {
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Write something..."
                 />
+                  <input type="file" onChange={(e) => {
+    console.log(e.target.files[0]); // This will show you the file object
+    setImage(e.target.files[0]);
+}} accept="image/*" />
+
                 <button className="blogbtn" type="button" onClick={submitPost}>SUBMIT POST</button>
             </div>
         </div>

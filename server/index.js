@@ -112,7 +112,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-const storage = multer.diskStorage({
+const PPstorage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/profilePicture');
     },
@@ -124,7 +124,7 @@ const storage = multer.diskStorage({
 });
 
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: PPstorage });
 
 
 app.use('/uploads/profilePicture', express.static(path.join(__dirname, 'uploads', 'profilePicture')));
@@ -376,6 +376,7 @@ app.get('/api/session', (req, res) => {
 // Add this endpoint to your Express app
 // Inside your /api/submitVote endpoint
 
+
 app.post('/api/submitVote', async (req, res) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -499,24 +500,41 @@ app.post('/api/challenge-details', async (req, res) => {
     } 
 });
 
-
-app.post('/submit-blog-post', async (req, res) => {
-    if (!req.session || !req.session.user) {
-        return res.status(401).json({ message: "Unauthorized" });
+const blogImageStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/BlogPictures'); // Ensure this directory exists
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
+});
 
-    const { content } = req.body;
-    const username = req.session.user.username; // Assuming the username is stored in the session
+const blogUpload = multer({ storage: blogImageStorage });
+
+app.use('/uploads/BlogPictures', express.static(path.join(__dirname, 'uploads', 'BlogPictures')));
+
+
+app.post('/submit-blog-post', blogUpload.single('image'), async (req, res) => {
+    const { content } = req.body; // Text content of the post
+    console.log(req.body); // Should log the content
+    console.log(req.file); 
+    const image = req.file ? `http://localhost:3001/uploads/BlogPictures/${req.file.filename}` : null;
 
     try {
-        const newBlogPost = await BlogpostDetailModel.create({ username, content });
-        io.emit('newBlogPost', { message: 'New blog post submitted' }); // Emit an event to all clients
+        const newBlogPost = await BlogpostDetailModel.create({
+            username: req.session.user.username, // Assuming the username is stored in the session
+            content,
+            image
+        });
+        io.emit('newBlogPost', { message: 'New blog post submitted' }); // Notify all clients
         res.status(201).json(newBlogPost);
     } catch (error) {
         console.error('Failed to submit blog post:', error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+
 
 
 // In your server-side code
