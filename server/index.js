@@ -409,10 +409,11 @@ app.post('/challenge', async (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { chName, chFormat, chDeadline, chStakes, chDescription, generateInviteCode } = req.body;
+    const { chName, chType, chFormat, chDeadline, chStakes, chDescription, generateInviteCode } = req.body;
 
     let challengeData = {
         chName,
+        chType,
         chFormat,
         chDeadline,
         chStakes,

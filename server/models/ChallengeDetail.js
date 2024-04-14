@@ -4,6 +4,7 @@ const UserDetailsModel = require('./UserDetails')
 
 const ChallengeDetailsSchema = new mongoose.Schema({
     chName: String,
+    chType: String,
     chFormat: String,
     chDeadline: Date,
     chStakes: String,

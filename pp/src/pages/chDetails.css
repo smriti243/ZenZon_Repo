@@ -75,12 +75,27 @@ body{
     background-color: #d9d9d9;
     margin-left: 9%;
 }
+.chType{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    margin-top: 10%;
+    /* grid-row-start: 3;
+    grid-row-end: 4; */
+    height: 44px;
+    width: 60%;
+    margin-left: 9%;
+    
+    border-radius: 40px;
+    background-color: #d9d9d9;
+    border: 1px black solid;
+}
 
 .chFormat{
     grid-column-start: 1;
     grid-column-end: 2;
     grid-row-start: 1;
-    margin-top: 10%;
+    margin-top: 20%;
     /* grid-row-start: 3;
     grid-row-end: 4; */
     height: 44px;
@@ -101,13 +116,13 @@ body{
     height: 44px;
     width: 60%;
     margin-left: 9%;
-    margin-top: 20%;
+    margin-top: 30%;
     border-radius: 40px;
     background-color: #d9d9d9;
     border: 1px black solid;
 }
 .chStakes{
-    grid-column-start: 1;
+    grid-column-start: 2;
     grid-column-end: 2;
     grid-row-start: 1;
     /* grid-row-start: 3;
@@ -115,7 +130,7 @@ body{
     height: 44px;
     width: 60%;
     margin-left: 9%;
-    margin-top: 30%;
+    /* margin-top: 30%; */
     border-radius: 40px;
     background-color: #d9d9d9;
     border: 1px black solid;
@@ -127,8 +142,9 @@ body{
     /* grid-row-start: 3;
     grid-row-end: 4; */
     height: 145px;
-    width: 60%;
+    width: 58%;
     margin-left: 10%;
+    margin-top: 10%;
     border-radius: 40px;
     background-color: #d9d9d9;
     border: 1px black solid;
@@ -138,7 +154,7 @@ body{
     grid-column-end: 3;
     grid-row-start: 1;
 
-    margin-top: 23%;
+    margin-top: 35%;
     height: 42px;
     width: 30%;
     margin-left: 10%;
@@ -158,8 +174,8 @@ body{
     margin-top: 27%;
     height: 42px;
     width: 30%;
-    margin-top: 30%;
-    margin-left: 10%;
+    margin-top: 35%;
+    margin-left: 45%;
     border-radius: 45px;
     background-color: #ffffee;
     border: 5px #ffba00 solid;

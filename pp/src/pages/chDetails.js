@@ -11,6 +11,7 @@ axios.defaults.withCredentials = true;
 function ChallengePage(){
 
 const [chName, setChName] = useState(); 
+const [chType, setChType] = useState();
 const [chFormat, setChFormat] = useState();
 const [chDeadline, setChDeadline] = useState();
 const [chStakes, setChStakes] = useState();
@@ -21,9 +22,9 @@ const today = new Date().toISOString().split('T')[0];
 
 let challengeSubmit= (e)=>{
     e.preventDefault();
-    if (chName &&  chFormat && chDeadline && chStakes && chDescription ){
+    if (chName && chType && chFormat && chDeadline && chStakes && chDescription ){
        if (chFormat === "Individual"){
-        axios.post("http://localhost:3001/challenge", {chName, chFormat, chDeadline, chStakes, chDescription})
+        axios.post("http://localhost:3001/challenge", {chName, chType, chFormat, chDeadline, chStakes, chDescription})
         .then(response => { console.log(response)
         // Assuming the server response includes the challengeId
         const challengeId = response.data.challengeId;
@@ -48,6 +49,7 @@ let handleInviteFriends = (e) => {
         if (chFormat === "Group") {
             axios.post("http://localhost:3001/challenge", {
                 chName,
+                chType,
                 chFormat,
                 chDeadline,
                 chStakes,
@@ -97,6 +99,12 @@ let handleInviteFriends = (e) => {
              > 
             </input>
             <label for = "format"></label>
+                <select name="format" className="chType" onChange={(e)=> setChFormat(e.target.value)}>
+                    <option value="" disabled hidden selected>Challenge Type</option>
+                    <option value="Physical">Physical Challenge</option>
+                    <option value="Technical">Technical Challenge</option>
+                </select>
+            <label for = "format"></label>
                 <select name="format" className="chFormat" onChange={(e)=> setChFormat(e.target.value)}>
                     <option value="" disabled hidden selected>Challenge Format</option>
                     <option value="Individual">Individual Challenge</option>
@@ -115,7 +123,6 @@ let handleInviteFriends = (e) => {
                     <option value="stakes" disabled selected hidden>Challenge Stakes</option>
                     <option value="image">Image</option>
                     <option value="money">Money</option>
-                    <option value="dare">Dare</option>
                 </select>
             {/* <input 
                 type="text" 
