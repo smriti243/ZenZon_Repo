@@ -16,6 +16,7 @@ import Profile from '../pages/profile';
 import Bg from './background';
 import ImageStake from '../pages/imageStake';
 import RunningChallengePage from '../pages/RunningChallengePage';
+import WallOfShame from "../pages/wallOfShame"
 
 function App() {
     return (<div>
@@ -33,6 +34,7 @@ function App() {
              <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
              <Route path="/imageStake" element={<ProtectedRoute><ImageStake /></ProtectedRoute>} />
              <Route path="/RunningChallengePage" element={<ProtectedRoute><RunningChallengePage /></ProtectedRoute>} />
+             <Route path="/WallOfShame" element={<ProtectedRoute><WallOfShame /></ProtectedRoute>} />
             </Routes>
         </AuthProvider>
         

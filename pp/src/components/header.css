@@ -157,3 +157,29 @@
     margin-top: 15px;
     text-decoration: none;
 }
+.Wos{
+    font-family: "Lalezar", system-ui;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    margin-left: 0px;
+    font-weight:600;
+    grid-row-start:1;
+    grid-row-end: 2;
+    color: #6D9773;
+    margin-top: 10px;
+    text-decoration: none;
+    margin-left: 5%;
+}
+.LinkStyle_wos{
+    /* border: 5px black solid; */
+    width: 28%;
+    height: 25%;
+    margin-left: 5px;
+    grid-row-start:1 ;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    margin-left: 97%;
+    margin-top: 10px;
+    text-decoration: none;
+}

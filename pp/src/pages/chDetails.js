@@ -17,6 +17,8 @@ const [chStakes, setChStakes] = useState();
 const [chDescription, setChDescription] = useState();
 const navigate = useNavigate();
 
+const today = new Date().toISOString().split('T')[0];
+
 let challengeSubmit= (e)=>{
     e.preventDefault();
     if (chName &&  chFormat && chDeadline && chStakes && chDescription ){
@@ -103,6 +105,7 @@ let handleInviteFriends = (e) => {
             <input 
                 type="date" 
                 className="chDeadline" 
+                min={today} 
                 placeholder="Challenge Deadline"
                 onChange={(e)=> setChDeadline(e.target.value)}
                 >
