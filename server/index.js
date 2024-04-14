@@ -7,6 +7,7 @@ const MongoStore = require("connect-mongo")
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const fs = require('fs');
+const cron = require('node-cron');
 
 const UserDetailsModel = require("./models/UserDetails")
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
@@ -238,6 +239,35 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err });
     }
 });
+
+
+// Schedule a task to run every day at midnight to check for expired challenges
+cron.schedule('0 0 * * *', async () => {
+    console.log('Running a daily check for expired challenges.');
+    const today = new Date();
+    const expiredChallenges = await ChallengeDetailsModel.find({
+        chDeadline: { $lt: today },
+        stakeImagePath: { $ne: null },
+        uploadedToWallOfShame: { $ne: true }
+    });
+
+    expiredChallenges.forEach(async (challenge) => {
+        challenge.uploadedToWallOfShame = true;
+        await challenge.save();
+        console.log(`Challenge ${challenge._id} moved to Wall of Shame.`);
+    });
+});
+
+app.get('/api/wall-of-shame', async (req, res) => {
+    try {
+        const challenges = await ChallengeDetailsModel.find({ uploadedToWallOfShame: true });
+        res.status(200).json(challenges);
+    } catch (error) {
+        console.error('Failed to fetch challenges for Wall of Shame:', error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
 
 app.get('/api/running-challenges', async (req, res) => {
     // Check if the session exists and has the userId stored

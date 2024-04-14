@@ -7,4 +7,49 @@
     background-color: #ffffee;
     box-shadow: 1px 1px 70px black;
     display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 5% 95%;
+}
+
+.WallOf{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    margin-left: 10%;
+    font-family: "cocogoose",sans-serif;
+    font-weight: 1000;
+    color: #0c3b2e;
+}
+
+.Shame{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    margin-left: 36%;
+    font-family: "cocogoose",sans-serif;
+    font-weight: 1000;
+    -webkit-text-stroke: 3px;
+    color: #0c3b2e;
+    -webkit-text-fill-color: #ffffee;
+}
+
+.imagesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+}
+
+.shameImageContainer {
+    margin: 10px;
+    border: 2px solid red;
+    padding: 10px;
+}
+
+.shameImageContainer img {
+    width: 100%; /* Adjust based on your layout */
+    height: auto;
+    max-width: 200px; /* Set a max width for images */
 }
