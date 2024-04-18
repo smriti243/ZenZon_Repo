@@ -3,51 +3,76 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import './voting.css';
 
-const socket = io("http://localhost:3001", { path: '/socket.io', transports: ["websocket", "polling"] });
+const socket = io("http://localhost:3001", { 
+    path: '/socket.io', 
+    transports: ["websocket", "polling"] });
 
 function Voting() {
     const [userId, setUserId] = useState(null);
-    const [votes, setVotes] = useState({ yes: 0, no: 0 });
-    const [hasVoted, setHasVoted] = useState(false); // Track if the user has voted
+    const [images, setImages] = useState([]); // Store images from the server
+    const [votedImages, setVotedImages] = useState({}); // Object to track votes per image
 
     useEffect(() => {
         axios.get('http://localhost:3001/api/session', { withCredentials: true })
             .then(response => {
                 setUserId(response.data.userId);
             })
-            .catch(error => {
-                console.error('Error fetching user ID:', error);
-            });
+            .catch(error => console.error('Error fetching user ID:', error));
 
-        socket.on('voteUpdate', (updatedVotes) => {
-            setVotes(updatedVotes);
+        axios.get('http://localhost:3001/api/challenge-completion-images', { withCredentials: true })
+            .then(response => {
+                // Initialize votes if not present
+                const imagesWithVotes = response.data.map(image => ({
+                    ...image,
+                    votes: image.votes || { yes: 0, no: 0 }
+                }));
+                setImages(imagesWithVotes);
+            })
+            .catch(error => console.error('Error fetching images:', error));
+            socket.on('voteUpdate', (updatedVote) => {
+                setImages(currentImages => currentImages.map(img => 
+                    img._id === updatedVote.imageId ? { ...img, votes: updatedVote.votes } : img
+                ));
+            });
             
-        });
 
         return () => {
             socket.off('voteUpdate');
         };
     }, []);
 
-    const submitVote = async (vote) => {
-        if (!userId || hasVoted) {
-            console.log('Cannot submit vote.');
+    const submitVote = async (imageId, vote) => {
+        if (!userId || votedImages[imageId]) {
+            console.log('Cannot submit vote or already voted for this image.');
             return;
         }
         try {
-            await axios.post('http://localhost:3001/api/submitVote', { userId, vote }, { withCredentials: true });
-            setHasVoted(true); // Prevent further voting
+            await axios.post('http://localhost:3001/api/submitVote', { userId, vote, imageId }, { withCredentials: true });
+            setVotedImages(prev => ({ ...prev, [imageId]: true })); // Mark this image as voted
         } catch (error) {
             console.error('Error submitting vote:', error);
-            alert('You have already voted.');
+            alert('Failed to submit vote.');
         }
     };
+    
 
     return (
         <div className="voting">
-            <h1>Are you happy?</h1>
-            <button disabled={hasVoted} onClick={() => submitVote('yes')}>Yes ({votes.yes})</button>
-            <button disabled={hasVoted} onClick={() => submitVote('no')}>No ({votes.no})</button>
+            <h1>Vote on these images</h1>
+            {images.map(image => (
+    <div key={image._id} className="image-voting">
+        <img className='VotingImages' src={`http://localhost:3001/${image.chCompletionImage}`} alt="Completion" />
+        <div className="voting-buttons">
+            <button disabled={!!votedImages[image._id]} onClick={() => submitVote(image._id, 'yes')}>
+                Yes ({image.votes ? image.votes.yes : 0})
+            </button>
+            <button disabled={!!votedImages[image._id]} onClick={() => submitVote(image._id, 'no')}>
+                No ({image.votes ? image.votes.no : 0})
+            </button>
+        </div>
+    </div>
+))}
+
         </div>
     );
 }

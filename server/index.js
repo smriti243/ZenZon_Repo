@@ -19,6 +19,7 @@ const { Server } = require("socket.io");
 
 const app = express()
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: "http://localhost:3000",
     credentials: true
@@ -611,34 +612,69 @@ app.get('/api/session', (req, res) => {
 
 
 app.post('/api/submitVote', async (req, res) => {
-    if (!req.session || !req.session.user) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
+    const { userId, imageId, vote } = req.body;
 
-    const { userId, vote } = req.body;
+    if (!userId || !imageId) {
+        return res.status(400).json({ message: "Missing parameters" });
+    }
 
     try {
-        const existingVote = await VotingDetailsModel.findOne({ userId });
-
-        if (existingVote) {
-            return res.status(409).json({ message: "You have already voted" });
+        const foundVote = await VotingDetailsModel.findOne({ userId, imageId });
+        console.log('Found Vote:', foundVote);
+        if (foundVote) {
+            return res.status(409).json({ message: "You have already voted on this image" });
         }
 
-        await VotingDetailsModel.create({ userId, vote });
 
-        // Calculate the updated vote counts
-        const yesVotesCount = await VotingDetailsModel.countDocuments({ vote: 'yes' });
-        const noVotesCount = await VotingDetailsModel.countDocuments({ vote: 'no' });
+        const newVote = new VotingDetailsModel({
+            userId,
+            imageId,
+            vote
+        });
+        await newVote.save();
+        console.log('New Vote Saved:', newVote);
 
-        // Emit the updated vote counts to all clients
-        io.emit('voteUpdate', { yes: yesVotesCount, no: noVotesCount });
+        // Emit updated vote counts
+       // Emit updated vote counts
 
-        res.json({ message: "Vote submitted successfully" });
+       console.log('ImageId as received:', imageId);
+       console.log('ImageId converted to ObjectId:', mongoose.Types.ObjectId(imageId));
+       
+
+const votes = await VotingDetailsModel.aggregate([
+    { $match: { imageId: mongoose.Types.ObjectId(imageId) } }, // Ensure matching is done properly
+    { $group: { _id: "$vote", count: { $sum: 1 } } }
+]);
+
+console.log('Aggregated votes:', votes);
+
+const voteCounts = { yes: 0, no: 0 }; // Default to zero for both options
+votes.forEach(vote => {
+    voteCounts[vote._id] = vote.count;
+});
+
+console.log('Vote counts:', voteCounts);
+
+io.emit('voteUpdate', { imageId, votes: voteCounts });
+
+
+        res.status(201).json({ message: "Vote recorded successfully" });
     } catch (error) {
-        console.error('Failed to submit vote:', error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error('Error submitting vote:', error);
+        res.status(500).json({ message: "Server error", error });
     }
 });
+
+app.get('/api/challenge-completion-images', async (req, res) => {
+    try {
+        const challenges = await ChallengeDetailsModel.find({ chCompletionImage: { $ne: null } }).select('chCompletionImage');
+        res.json(challenges);
+    } catch (error) {
+        console.error('Failed to fetch challenge images:', error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
 
 // app.post('/api/challenge-details', async (req, res) => {
 //     if (!req.session || !req.session.user) {

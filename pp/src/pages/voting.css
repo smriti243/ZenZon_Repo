@@ -2,3 +2,7 @@ button:disabled{
     background-color: #ffffee;
     color: #000000;
 }
+.VotingImages{
+    height: 200px;
+    width: auto;
+}

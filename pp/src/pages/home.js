@@ -24,6 +24,7 @@ function Home() {
        <div className="bg">
             <div className="hd">
             <h2 className="cName">ZENZONE</h2>
+            <Link to="../apiPage" className="LinkStyle_waka"><h3 className="Waka">WAKATIME</h3></Link>
             <Link to="../WallOfShame" className="LinkStyle_wos"><h3 className="Wos">WALL OF SHAME</h3></Link>
             <Link className="LinkStyle_profile" to = "../profile"><div className="profile"></div></Link>
             <h3 className="challenges" onClick={togglePopup}>CHALLENGES</h3>

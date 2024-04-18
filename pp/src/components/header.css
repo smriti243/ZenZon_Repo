@@ -183,3 +183,27 @@
     margin-top: 10px;
     text-decoration: none;
 }
+.Waka{
+    font-family: "Lalezar", system-ui;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    font-weight:600;
+    grid-row-start:1;
+    grid-row-end: 2;
+    color: #6D9773;
+    margin-top: 10px;
+    text-decoration: none;
+    margin-left: 0%;
+}
+.LinkStyle_waka{
+    /* border: 5px black solid; */
+    width: 28%;
+    height: 25%;
+    grid-row-start:1 ;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    margin-left: 77%;
+    margin-top: 10px;
+    text-decoration: none;
+}
