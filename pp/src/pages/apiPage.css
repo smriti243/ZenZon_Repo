@@ -1,0 +1,115 @@
+.integrate{
+    color: #0C3B2E;
+    font-size: 50px;
+    font-weight: 1000;
+    margin-left: 5%;
+    font-family: "Inter", sans-serif;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 2;
+   
+}
+.wakatime{
+    color: #0C3B2E;
+    /* margin-top: -60px; */
+    font-size: 50px;
+    font-weight: 1000;
+    -webkit-text-stroke: 3px;
+    -webkit-text-fill-color: #ffffee;
+    margin-left: 20%;
+    font-family: "Inter", sans-serif;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    margin-left:50%;
+}
+.apimsg1{
+    color: #ffba0f;
+    /* font-size: 50px;
+    font-weight: 1000; */
+    font-family: "Inter", sans-serif;
+    grid-row-start: 1;
+    grid-row-end: 2;
+    /* margin-top: 150px; */
+    margin-left:20%;
+    font-weight: 250;
+}
+.apimsg2{
+    color: #ffba0f;
+    /* font-size: 50px;
+    font-weight: 1000; */
+    margin-left: 5%;
+    font-family: "Inter", sans-serif;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    /* margin-top: 150px; */
+    margin-left:2%;
+    font-weight: 500;
+}
+.linkToAPIkey{
+    color: #ffffee;
+    /* font-size: 50px;
+    font-weight: 1000; */
+    margin-left: 15%;
+    font-family: "Inter", sans-serif;
+    grid-row-start: 3;
+    grid-row-end: 4;    
+    /* margin-top: 150px; */
+   
+    font-weight: 650;   
+}
+.Linkstyle_linkToAPIkey{   
+    color: #ffffee;
+    /* font-size: 50px;
+    font-weight: 1000; */
+    margin-left: 2%;
+    font-family: "Inter", sans-serif;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    /* margin-top: 150px; */
+    text-decoration: none;
+    font-weight: 650;   
+}
+.linktoAPIkeybox{
+    border: none;
+    border-radius: 45px;
+    height: 50px;
+    width: 250px;
+    margin-left: 20%;
+    font-family: "Inter", sans-serif;
+    background-color:#ffba0f;
+    font-weight: 650;   
+
+}
+.msgbox{
+    /* border: 5px black solid; */
+    grid-row-start: 2;
+    grid-row-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 2; 
+    margin-top: 90px;
+    margin-left:10%;
+    height: 300px;
+    width: 500px;
+    display: grid;
+    /* grid-template-columns: 20% 60% 20%; */
+    grid-template-rows: 20% 20% 60%;
+}
+.apibtn{
+    border: none;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    margin-top: 90px;
+    background-color:#ffba0f;
+    color: #ffffee;
+    border-radius: 45px;
+    font-family: "Inter", sans-serif;
+    font-weight: 650;   
+    height: 50px;
+    margin-left:10%;
+    width: 250px;
+}

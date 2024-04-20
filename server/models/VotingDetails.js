@@ -8,6 +8,7 @@ const voteSchema = new mongoose.Schema({
   },
   imageId: { // Added field to track the image being voted on
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'challengedetails',
     required: true
   },
   vote: {

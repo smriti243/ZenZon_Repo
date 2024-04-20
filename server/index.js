@@ -8,6 +8,9 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const fs = require('fs');
 const cron = require('node-cron');
+//const fetch = require('node-fetch');
+//const queryString = require('query-string');
+const fetch = require('isomorphic-fetch');
 
 const UserDetailsModel = require("./models/UserDetails")
 const ChallengeDetailsModel = require("./models/ChallengeDetail")
@@ -24,6 +27,28 @@ app.use(cors({
     origin: "http://localhost:3000",
     credentials: true
 }))
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = 'http://localhost:3001/sui';
+
+// Asynchronously import the query-string module
+let queryString;
+
+import('query-string').then(module => {
+    queryString = module.default;
+}).catch(error => {
+    console.error('Failed to load the query-string module:', error);
+});
+
+
+// Asynchronously import the query-string module
+// let queryString;
+
+// (async () => {
+//     queryString = await import('query-string');
+// })();
+
 
 app.use(session({
     secret: "IdidnotknowIhadthismuchpower",
@@ -241,6 +266,89 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+app.get('/wakatime/authorize', async (req, res) => {
+    if (!queryString) {
+       //queryString = await import('query-string');
+
+       return res.status(500).send('Server error: query-string module not loaded');
+    }
+  try{  
+    const authorizeUrl = `https://wakatime.com/oauth/authorize?${queryString.stringify({
+        client_id: CLIENT_ID,
+        response_type: 'code',
+        redirect_uri: REDIRECT_URI,
+        scope: 'read_summaries.languages,read_summaries.editors',
+    })}`;
+
+    res.redirect(authorizeUrl);
+} catch (error) {
+    console.error('Error building the authorize URL:', error);
+    res.status(500).json({ message: 'Failed to build authorize URL' });
+}
+});
+
+app.get('/sui', async (req, res) => {
+    const { code } = req.query;
+
+    try {
+        const response = await fetch('https://wakatime.com/oauth/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: queryString.stringify({
+                client_id: CLIENT_ID,
+                client_secret: CLIENT_SECRET,
+                code,
+                grant_type: 'authorization_code',
+                redirect_uri: REDIRECT_URI,
+            }),
+        });
+
+        const text = await response.text();  // First get text to check if it's valid JSON or URL-encoded
+        try {
+            // Try parsing as URL-encoded
+            const params = new URLSearchParams(text);
+            const accessToken = params.get('access_token');
+
+            if (accessToken) {
+                req.session.wakatimeAccessToken = accessToken;
+                res.redirect('http://localhost:3000/apiPage');  // Redirect to a success page or another part of your app
+            } else {
+                throw new Error('No access token received.');
+            }
+        } catch (err) {
+            throw new Error(`Failed to parse response: ${text}`);
+        }
+    } catch (error) {
+        console.error('Token exchange error:', error);
+        res.status(500).send(`Internal Server Error: ${error.message}`);
+    }
+});
+
+
+
+app.get('/wakatime/user-summaries', async (req, res) => {
+    const accessToken = req.session.wakatimeAccessToken; // Assuming it's stored in the session
+
+    const response = await fetch(`https://wakatime.com/api/v1/users/current/summaries`, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+
+    const data = await response.json();
+    res.json(data);
+});
+
+app.get('/api/check-wakatime-connection', (req, res) => {
+    if (req.session && req.session.wakatimeAccessToken) {
+        // Optionally verify the token's validity by making a test API call to WakaTime
+        res.json({ isConnected: true });
+    } else {
+        res.json({ isConnected: false });
+    }
+});
 
 // Schedule a task to run every day at midnight to check for expired challenges
 cron.schedule('0 0 * * *', async () => {
@@ -667,13 +775,53 @@ io.emit('voteUpdate', { imageId, votes: voteCounts });
 
 app.get('/api/challenge-completion-images', async (req, res) => {
     try {
-        const challenges = await ChallengeDetailsModel.find({ chCompletionImage: { $ne: null } }).select('chCompletionImage');
+        const challenges = await ChallengeDetailsModel.aggregate([
+            {
+                $match: { chCompletionImage: { $ne: null } } // Filter challenges that have a completion image
+            },
+            {
+                $lookup: {
+                    from: VotingDetailsModel.collection.name, // Join with the voting details collection
+                    let: { imageId: '$_id' }, // Define variable to use in the pipeline
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ['$imageId', '$$imageId'] // Match votes related to the challenge image
+                                }
+                            }
+                        },
+                        {
+                            $group: { // Group results by vote type and count them
+                                _id: '$vote',
+                                count: { $sum: 1 }
+                            }
+                        },
+                        {
+                            $project: { // Shape the output to label the vote counts
+                                voteType: '$_id',
+                                count: 1
+                            }
+                        }
+                    ],
+                    as: 'votes' // Output array containing vote results
+                }
+            },
+            {
+                $project: { // Shape the final document structure
+                    chCompletionImage: 1,
+                    votes: 1 // Include the votes array in the output
+                }
+            }
+        ]);
+
         res.json(challenges);
     } catch (error) {
         console.error('Failed to fetch challenge images:', error);
         res.status(500).json({ message: "Server error", error });
     }
 });
+
 
 
 // app.post('/api/challenge-details', async (req, res) => {

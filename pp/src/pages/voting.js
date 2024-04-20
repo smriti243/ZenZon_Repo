@@ -19,17 +19,27 @@ function Voting() {
             })
             .catch(error => console.error('Error fetching user ID:', error));
 
+            function formatVotes(votesArray) {
+                const votesObject = {};
+                votesArray.forEach(vote => {
+                    votesObject[vote.voteType] = vote.count;
+                });
+                return votesObject;
+            }
+
         axios.get('http://localhost:3001/api/challenge-completion-images', { withCredentials: true })
             .then(response => {
                 // Initialize votes if not present
                 const imagesWithVotes = response.data.map(image => ({
                     ...image,
-                    votes: image.votes || { yes: 0, no: 0 }
+                    votes: formatVotes(image.votes)
                 }));
+                console.log('Fetched images with votes:', imagesWithVotes);
                 setImages(imagesWithVotes);
             })
             .catch(error => console.error('Error fetching images:', error));
             socket.on('voteUpdate', (updatedVote) => {
+                console.log('Received vote update:', updatedVote);
                 setImages(currentImages => currentImages.map(img => 
                     img._id === updatedVote.imageId ? { ...img, votes: updatedVote.votes } : img
                 ));
