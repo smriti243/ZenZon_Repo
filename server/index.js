@@ -327,19 +327,32 @@ app.get('/sui', async (req, res) => {
 });
 
 
-
 app.get('/wakatime/user-summaries', async (req, res) => {
     const accessToken = req.session.wakatimeAccessToken; // Assuming it's stored in the session
+    
+    // Set up date range: default to the last 7 days if not specified in the query
+    const endDate = new Date(); // today's date
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 7); // 7 days ago
 
-    const response = await fetch(`https://wakatime.com/api/v1/users/current/summaries`, {
+    // Convert dates to YYYY-MM-DD format
+    const format = (date) => date.toISOString().split('T')[0];
+
+    const response = await fetch(`https://wakatime.com/api/v1/users/current/summaries?start=${format(startDate)}&end=${format(endDate)}`, {
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
     });
 
+    if (!response.ok) {
+        const error = await response.text();
+        return res.status(response.status).json({ error });
+    }
+
     const data = await response.json();
     res.json(data);
 });
+
 
 app.get('/api/check-wakatime-connection', (req, res) => {
     if (req.session && req.session.wakatimeAccessToken) {

@@ -27,6 +27,11 @@ function ApiPage() {
     useEffect(() => {
         const fetchWakaTimeData = async () => {
             if (isConnected) {
+                const startDate = new Date(); // Example: set the start date to today
+                startDate.setDate(startDate.getDate() - 7); // Adjust for the desired range, e.g., the last 7 days
+                const endDate = new Date(); // End date as today
+
+                const formatDate = (date) => date.toISOString().split('T')[0];
                 try {
                     const response = await fetch("http://localhost:3001/wakatime/user-summaries", {
                         credentials: 'include'
