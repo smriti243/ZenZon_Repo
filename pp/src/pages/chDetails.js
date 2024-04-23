@@ -22,30 +22,39 @@ const today = new Date().toISOString().split('T')[0];
 
 let challengeSubmit= (e)=>{
     e.preventDefault();
+   try{
     if (chName && chType && chFormat && chDeadline && chStakes && chDescription ){
-       if (chFormat === "Individual"){
-        axios.post("http://localhost:3001/challenge", {chName, chType, chFormat, chDeadline, chStakes, chDescription})
-        .then(response => { console.log(response)
-        // Assuming the server response includes the challengeId
-        const challengeId = response.data.challengeId;
-        // Store the challengeId in local storage
-        localStorage.setItem('currentChallengeId', challengeId);
-        })
-        .catch(err => {console.log(err)})
-        navigate('/checkpoint')
-       }
-       else {
-        alert("Press Invite Friends for group challenges")
-       }
-    }
-    else{
+        console.log(chName, chType, chFormat,chDeadline, chStakes, chDescription)
+        if (chFormat === "Individual"){
+         axios.post("http://localhost:3001/challenge", {chName, chType, chFormat, chDeadline, chStakes, chDescription})
+         .then(response => { console.log(response)
+         // Assuming the server response includes the challengeId
+         const challengeId = response.data.challengeId;
+         // Store the challengeId in local storage
+         localStorage.setItem('currentChallengeId', challengeId);
+         })
+         .catch(err => {console.log(err)})
+         navigate('/checkpoint')
+        }
+        else {
+         alert("Press Invite Friends for group challenges")
+        }
+     }
+      else{
         alert("Please fill out all fields.")
     }
+   }
+   catch(err){
+    console.log(err)
+   }
+    // else{
+    //     alert("Please fill out all fields.")
+    // }
 }
 
 let handleInviteFriends = (e) => {
     e.preventDefault();
-    if (chName && chFormat && chDeadline && chStakes && chDescription) {
+    if (chName && chType && chFormat && chDeadline && chStakes && chDescription) {
         if (chFormat === "Group") {
             axios.post("http://localhost:3001/challenge", {
                 chName,
@@ -99,7 +108,7 @@ let handleInviteFriends = (e) => {
              > 
             </input>
             <label for = "format"></label>
-                <select name="format" className="chType" onChange={(e)=> setChFormat(e.target.value)}>
+                <select name="format" className="chType" onChange={(e)=> setChType(e.target.value)}>
                     <option value="" disabled hidden selected>Challenge Type</option>
                     <option value="Physical">Physical Challenge</option>
                     <option value="Technical">Technical Challenge</option>
