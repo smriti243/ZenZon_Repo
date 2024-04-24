@@ -9,24 +9,29 @@ const socket = io('http://localhost:3001', { withCredentials: true });
 function Lobby() {
     const [participants, setParticipants] = useState([]);
     const [isCreator, setIsCreator] = useState(false);
+    const [userId, setUserId] = useState(null);
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
         const challengeId = localStorage.getItem('currentChallengeId');
-        const userId = localStorage.getItem('userId'); // Assuming you store the current user's ID in localStorage
+        // const userId = localStorage.getItem('userId'); // Assuming you store the current user's ID in localStorage
 
         if (challengeId) {
             socket.emit('joinRoom', { challengeId });
 
             axios.post('http://localhost:3001/api/challenge-details', { challengeId }, { withCredentials: true })
-                .then(response => {
-                    setParticipants(response.data.participants);
-                    // Determine if the current user is the creator
-                    setIsCreator(response.data.createdBy === userId);
-                })
-                .catch(error => {
-                    console.error('Error fetching challenge details:', error);
-                });
+            .then(response => {
+                console.log('Participants:', response.data.participants); // Check participants data
+                console.log('Creator ID:', response.data.createdBy); // Log creator ID
+                console.log('Current User ID:', response.data.userId); // Log current user ID
+                setUserId(response.data.userId)
+                setParticipants(response.data.participants);
+                setIsCreator(response.data.createdBy === userId);
+            })
+            .catch(error => {
+                console.error('Error fetching challenge details:', error);
+            });
+        
 
             const handleUpdateParticipants = updatedParticipants => {
                 setParticipants(updatedParticipants);
@@ -56,7 +61,7 @@ function Lobby() {
                 </div>
             ))}
             {isCreator && (
-                <button className='checkpointBtn' onClick={() => navigate('/checkpoint')}>Proceed to Checkpoint</button>
+                <button onClick={() => navigate('/checkpoint')}>SET CHECKPOINTS</button>
             )}
         </div>
     );

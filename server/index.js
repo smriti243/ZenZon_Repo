@@ -899,8 +899,10 @@ app.get('/api/challenge-completion-images', async (req, res) => {
 app.post('/api/challenge-details', async (req, res) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
+        
     }
 
+   // const userId = req.session.user.id;
     const { challengeId } = req.body;
 
     try {
@@ -921,8 +923,10 @@ app.post('/api/challenge-details', async (req, res) => {
             chFormat: challenge.chFormat,
             chDeadline: challenge.chDeadline,
             chStakes: challenge.chStakes,
+            createdBy: challenge.createdBy,
             chDescription: challenge.chDescription,
-            participants: challenge.participants // Directly send the populated participants
+            participants: challenge.participants ,// Directly send the populated participants
+            userId: req.session.user.id
         });
     } catch (error) {
         console.error('Error fetching challenge details:', error);

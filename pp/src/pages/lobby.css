@@ -70,3 +70,20 @@
     background-color: #d9d9d9;
     border-radius:25px ;
 }
+button {
+    display: block; /* Ensure button is not hidden */
+    grid-row-start: 3;
+    grid-row-end: 4;  
+    grid-column-start: 1;
+    grid-column-end: 2;
+    height: 15%;
+    width: 40%;
+    margin-top: 35%;
+    margin-left: 5%;
+    background-color: #ffba00;
+    border-radius: 45px;
+    border: none;
+    font-family: "Inter", sans-serif;
+    font-weight: 650;
+    color:#ffffee ; 
+}
