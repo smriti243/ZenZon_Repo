@@ -61,7 +61,7 @@ function Lobby() {
                 </div>
             ))}
             {isCreator && (
-                <button onClick={() => navigate('/checkpoint')}>SET CHECKPOINTS</button>
+                <button className="lobbybtn" onClick={() => navigate('/checkpoint')}>SET CHECKPOINTS</button>
             )}
         </div>
     );
