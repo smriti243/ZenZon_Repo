@@ -31,7 +31,7 @@ function ImageStake() {
         try {
             const response = await axios.post('http://localhost:3001/api/stake-image', formData, {
                 headers: {
-                  //  'Content-Type': 'multipart/form-data'
+                  'Content-Type': 'multipart/form-data'
                 }
             });
     
