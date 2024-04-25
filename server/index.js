@@ -8,6 +8,8 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const fs = require('fs');
 const cron = require('node-cron');
+const axios = require('axios');
+
 //const fetch = require('node-fetch');
 //const queryString = require('query-string');
 const fetch = require('isomorphic-fetch');
@@ -327,30 +329,89 @@ app.get('/sui', async (req, res) => {
 });
 
 
-app.get('/wakatime/user-summaries', async (req, res) => {
-    const accessToken = req.session.wakatimeAccessToken; // Assuming it's stored in the session
+// app.get('/wakatime/user-summaries', async (req, res) => {
+//     const accessToken = req.session.wakatimeAccessToken; // Assuming it's stored in the session
     
-    // Set up date range: default to the last 7 days if not specified in the query
-    const endDate = new Date(); // today's date
-    const startDate = new Date();
-    startDate.setDate(endDate.getDate() - 7); // 7 days ago
+//     // Set up date range: default to the last 7 days if not specified in the query
+//     const endDate = new Date(); // today's date
+//     const startDate = new Date();
+//     startDate.setDate(endDate.getDate() - 7); // 7 days ago
 
-    // Convert dates to YYYY-MM-DD format
-    const format = (date) => date.toISOString().split('T')[0];
+//     // Convert dates to YYYY-MM-DD format
+//     const format = (date) => date.toISOString().split('T')[0];
 
-    const response = await fetch(`https://wakatime.com/api/v1/users/current/summaries?start=${format(startDate)}&end=${format(endDate)}`, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-        },
-    });
+//     const response = await fetch(`https://wakatime.com/api/v1/users/current/summaries?start=${format(startDate)}&end=${format(endDate)}`, {
+//         headers: {
+//             'Authorization': `Bearer ${accessToken}`,
+//         },
+//     });
 
-    if (!response.ok) {
-        const error = await response.text();
-        return res.status(response.status).json({ error });
+//     if (!response.ok) {
+//         const error = await response.text();
+//         return res.status(response.status).json({ error });
+//     }
+
+//     const data = await response.json();
+//     res.json(data);
+// });
+
+// app.get('/wakatime/user-summaries', async (req, res) => {
+//     const accessToken = req.session.wakatimeAccessToken;
+//     if (!accessToken) {
+//         return res.status(403).json({ message: 'No WakaTime access token available' });
+//     }
+
+//     try {
+//         const response = await axios.get('https://wakatime.com/api/v1/users/current/summaries', {
+//             headers: { 'Authorization': `Bearer ${accessToken}` }
+//         });
+//         res.json(response.data);
+//     } catch (error) {
+//         res.status(500).json({ message: 'Failed to fetch WakaTime data', error: error.message });
+//     }
+// });
+
+app.get('/wakatime/user-summaries/:challengeId', async (req, res) => {
+    const { challengeId } = req.params;
+    const accessToken = req.session.wakatimeAccessToken;
+    if (!accessToken) {
+        return res.status(403).json({ message: 'No WakaTime access token available' });
     }
 
-    const data = await response.json();
-    res.json(data);
+    try {
+        // Fetch the challenge from your database to get the start date
+        const challenge = await ChallengeDetailsModel.findById(challengeId);
+        if (!challenge) {
+            return res.status(404).json({ message: 'Challenge not found' });
+        }
+
+        // Format the dates as YYYY-MM-DD
+        const format = (date) => date.toISOString().split('T')[0];
+        const startDate = format(challenge.chStartDate);  // Assuming there is a startDate field in your challenge model
+        const endDate = format(new Date());  // today's date
+
+        const organizeDataByDate = (data) => {
+            return data.map(day => ({
+                date: day.range.date,
+                hours: Math.floor(day.grand_total.total_seconds / 3600),
+                minutes: Math.floor((day.grand_total.total_seconds % 3600) / 60)
+            }));
+        };
+        
+        const response = await axios.get(`https://wakatime.com/api/v1/users/current/summaries?start=${startDate}&end=${endDate}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+
+        if (response.data && response.data.data) {
+            const organizedData = organizeDataByDate(response.data.data);
+            res.json(organizedData);
+        } else {
+            throw new Error('No data returned from WakaTime');
+        }
+    } catch (error) {
+        console.error('Failed to fetch WakaTime data:', error);
+        res.status(500).json({ message: 'Failed to fetch WakaTime data', error: error.message });
+    }
 });
 
 
@@ -531,12 +592,13 @@ app.post('/challenge', async (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { chName, chType, chFormat, chDeadline, chStakes, chDescription, generateInviteCode } = req.body;
+    const { chName, chType, chFormat, chStartDate, chDeadline, chStakes, chDescription, generateInviteCode } = req.body;
 
     let challengeData = {
         chName,
         chType,
         chFormat,
+        chStartDate,
         chDeadline,
         chStakes,
         chDescription,
@@ -556,6 +618,11 @@ app.post('/challenge', async (req, res) => {
             challengeId: challengeDetails._id,
             message: 'Challenge created successfully',
         };
+        if (chType === 'technical') {
+            // Assume technical challenges need to fetch and store additional data from WakaTime
+            const wakaTimeData = await fetchWakaTimeData(req.session.wakatimeAccessToken);
+            // Store or process WakaTime data as needed
+        }
 
         if (challengeData.inviteCode) {
             responseObject.inviteCode = challengeData.inviteCode;

@@ -16,17 +16,20 @@ const [chFormat, setChFormat] = useState();
 const [chDeadline, setChDeadline] = useState();
 const [chStakes, setChStakes] = useState();
 const [chDescription, setChDescription] = useState();
+
 const navigate = useNavigate();
 
 const today = new Date().toISOString().split('T')[0];
+const [chStartDate, setChStartDate] = useState(today);
+
 
 let challengeSubmit= (e)=>{
     e.preventDefault();
    try{
-    if (chName && chType && chFormat && chDeadline && chStakes && chDescription ){
-        console.log(chName, chType, chFormat,chDeadline, chStakes, chDescription)
+    if (chName && chType && chFormat && chStartDate &&chDeadline && chStakes && chDescription ){
+        console.log(chName, chType, chFormat, chStartDate,chDeadline, chStakes, chDescription)
         if (chFormat === "Individual"){
-         axios.post("http://localhost:3001/challenge", {chName, chType, chFormat, chDeadline, chStakes, chDescription})
+         axios.post("http://localhost:3001/challenge", {chName, chType, chFormat,chStartDate, chDeadline, chStakes, chDescription})
          .then(response => { console.log(response)
          // Assuming the server response includes the challengeId
          const challengeId = response.data.challengeId;
@@ -54,12 +57,13 @@ let challengeSubmit= (e)=>{
 
 let handleInviteFriends = (e) => {
     e.preventDefault();
-    if (chName && chType && chFormat && chDeadline && chStakes && chDescription) {
+    if (chName && chType && chFormat && chStartDate && chDeadline && chStakes && chDescription) {
         if (chFormat === "Group") {
             axios.post("http://localhost:3001/challenge", {
                 chName,
                 chType,
                 chFormat,
+                chStartDate,
                 chDeadline,
                 chStakes,
                 chDescription,
