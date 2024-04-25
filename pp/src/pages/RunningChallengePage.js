@@ -120,7 +120,7 @@ function RunningChallengePage() {
                 </div>
             )}
             {isChallengeUnderEvaluation() && (
-                <p>Challenge Under Evaluation</p>
+                <h1 className="challengeUnderEvaluationMsg">Challenge Under Evaluation</h1>
             )}
         </div>
     );
