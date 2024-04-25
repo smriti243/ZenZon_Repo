@@ -63,7 +63,7 @@ function RunningChallengePage() {
                 }
 
             });
-            alert('Completion image uploaded successfully! Your image will be uploade for the community to vote on,');
+            alert('Completion image uploaded successfully! Your image will be uploaded for the community to vote on.');
             navigate('/home');
         } catch (error) {
             console.error('Error uploading completion image:', error);
@@ -83,6 +83,11 @@ function RunningChallengePage() {
             });
     }, []);
 
+    // Function to check if completion image exists
+    const isChallengeUnderEvaluation = () => {
+        return challenge.chCompletionImage !== undefined && challenge.chCompletionImage !== null;
+    };
+
     return (
         <div className="RunningChallengeWhiteBox">
             <h1 className="ChallengeName">{challenge.chName}</h1>
@@ -91,23 +96,32 @@ function RunningChallengePage() {
                 <p>Deadline: {challenge.chDeadline}</p>
                 <p>Format: {challenge.chFormat}</p>
                 <p>Stakes: {challenge.chStakes}</p>
-                <input type="file" onChange={handleCompletionFileChange} />
-                <button onClick={handleChallengeComplete} className="challengeCompleteBtn">
-                    Challenge Complete
-                </button>
-            </div>
-            <div className="CheckpointsContainer">
-                {checkpoints.map((checkpoint, index) => (
-                    <div key={checkpoint._id} className="CheckpointBox" style={{ marginLeft: `${index * 20}px` }}>
-                        <p>Checkpoint {index + 1}: {checkpoint.description}</p>
-                        <p>Date: {checkpoint.date}</p>
-                        <input type="file" onChange={(e) => handleFileChange(e, checkpoint._id)} />
-                        <button onClick={() => handleUploadProgress(checkpoint._id)} className="uploadProgressBtn">
-                            Upload Progress
+                {!isChallengeUnderEvaluation() && (
+                    <div>
+                        <input type="file" onChange={handleCompletionFileChange} />
+                        <button onClick={handleChallengeComplete} className="challengeCompleteBtn">
+                            Challenge Complete
                         </button>
                     </div>
-                ))}
+                )}
             </div>
+            {!isChallengeUnderEvaluation() && (
+                <div className="CheckpointsContainer">
+                    {checkpoints.map((checkpoint, index) => (
+                        <div key={checkpoint._id} className="CheckpointBox" style={{ marginLeft: `${index * 20}px` }}>
+                            <p>Checkpoint {index + 1}: {checkpoint.description}</p>
+                            <p>Date: {checkpoint.date}</p>
+                            <input type="file" onChange={(e) => handleFileChange(e, checkpoint._id)} />
+                            <button onClick={() => handleUploadProgress(checkpoint._id)} className="uploadProgressBtn">
+                                Upload Progress
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+            {isChallengeUnderEvaluation() && (
+                <p>Challenge Under Evaluation</p>
+            )}
         </div>
     );
 }
