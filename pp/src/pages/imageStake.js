@@ -8,6 +8,7 @@ function ImageStake() {
     const navigate = useNavigate();
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
+        console.log('File selected:', event.target.files[0]);
     };
 
     const handleFinish = () => {
@@ -30,7 +31,7 @@ function ImageStake() {
         try {
             const response = await axios.post('http://localhost:3001/api/stake-image', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                  //  'Content-Type': 'multipart/form-data'
                 }
             });
     
@@ -47,6 +48,8 @@ function ImageStake() {
              <h1 className="check">IMAGE</h1>
             <h1 className="point">UPLOAD</h1>
             <input className="stakeImage" type="file" onChange={handleFileChange} name="stakeImage"></input>
+            {/* <button onClick={() => console.log('Button clicked!')}>Test Button</button> */}
+
             <button className="imageSubmitBtn"  onClick={handleSubmit}>SUBMIT</button>
             <button className="FinishBtn"  onClick={handleFinish}>FINISH</button>
         </div>

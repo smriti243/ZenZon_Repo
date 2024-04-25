@@ -652,6 +652,7 @@ app.post('/api/checkpoint', async (req, res) => {
 
 // Backend endpoint to fetch stakes
 app.get('/fetching-stakesvalue', async (req, res) => {
+    console.log("Request for stakes value received", req.query);
     const { challengeId } = req.query; // Extract challengeId from query parameters
     try {
       const challenge = await ChallengeDetailsModel.findById(challengeId);
@@ -665,9 +666,17 @@ app.get('/fetching-stakesvalue', async (req, res) => {
     }
   });
 
+  const uploadDir = './uploads/StakeImages';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('Created directory:', uploadDir);
+} else {
+    console.log('Upload directory already exists:', uploadDir);
+}
+
   const imageStorage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'uploads/StakeImages');  // Ensure this directory exists
+        cb(null, uploadDir);  // Ensure this directory exists
     },
     filename: function(req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -678,6 +687,8 @@ app.get('/fetching-stakesvalue', async (req, res) => {
 const ImageStakeupload = multer({ storage: imageStorage });
 
 app.post('/api/stake-image', ImageStakeupload.single('stakeImage'), async (req, res) => {
+    console.log('Request Body:', req.body);  // Check all incoming data
+    console.log('Request File:', req.file); 
     const challengeId = req.body.challengeId;
     console.log('Received challengeId:', challengeId); // Confirming challengeId is received
     if (!req.file) {

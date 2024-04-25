@@ -20,8 +20,13 @@ const fetchStakesValue = async () => {
     setStakes(response.data.chStakes); // Correct the property name here
   } catch (error) {
     console.error('Failed to fetch stakes value:', error);
+    
   }
 };
+if (!challengeId) {
+  console.error('Challenge ID is missing');
+  return;
+}
 
 
     if (challengeId) {

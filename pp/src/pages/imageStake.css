@@ -23,6 +23,7 @@
     font-size: 20px;
     color: #ffffee;
     border: none;
+    /* margin-top: 250px; */
 }
 
 .FinishBtn{
@@ -33,7 +34,7 @@
     grid-row-end: 4;
     width: 120px;
     height: 50px;
-    margin-left: 8%;
+    margin-left: 58%;
     border-radius: 50px;
     text-align: center;
     line-height: 50px;
