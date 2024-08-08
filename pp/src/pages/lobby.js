@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './lobby.css';
 import io from 'socket.io-client';
-import { useNavigate } from 'react-router-dom'; // For programmatic navigation
+import { useNavigate } from 'react-router-dom';
 
 const socket = io('http://localhost:3001', { withCredentials: true });
 
@@ -10,30 +10,28 @@ function Lobby() {
     const [participants, setParticipants] = useState([]);
     const [isCreator, setIsCreator] = useState(false);
     const [userId, setUserId] = useState(null);
-    const navigate = useNavigate(); // Hook for navigation
+    const navigate = useNavigate();
 
     useEffect(() => {
         const challengeId = localStorage.getItem('currentChallengeId');
-        // const userId = localStorage.getItem('userId'); // Assuming you store the current user's ID in localStorage
 
         if (challengeId) {
             socket.emit('joinRoom', { challengeId });
 
             axios.post('http://localhost:3001/api/challenge-details', { challengeId }, { withCredentials: true })
-            .then(response => {
-                console.log('Participants:', response.data.participants); // Check participants data
-                console.log('Creator ID:', response.data.createdBy); // Log creator ID
-                console.log('Current User ID:', response.data.userId); // Log current user ID
-                setUserId(response.data.userId)
-                setParticipants(response.data.participants);
-                setIsCreator(response.data.createdBy === userId);
-            })
-            .catch(error => {
-                console.error('Error fetching challenge details:', error);
-            });
-        
+                .then(response => {
+                    console.log('Participants:', response.data.participants);
+                    console.log('Creator ID:', response.data.createdBy);
+                    console.log('Current User ID:', response.data.userId);
+                    setUserId(response.data.userId);
+                    setParticipants(response.data.participants);
+                    setIsCreator(response.data.createdBy === response.data.userId);
+                })
+                .catch(error => {
+                    console.error('Error fetching challenge details:', error);
+                });
 
-            const handleUpdateParticipants = updatedParticipants => {
+            const handleUpdateParticipants = (updatedParticipants) => {
                 setParticipants(updatedParticipants);
             };
 
@@ -44,7 +42,23 @@ function Lobby() {
                 socket.emit('leaveRoom', { challengeId });
             };
         }
-    }, [socket]); // Depend on socket to ensure stable reference
+    }, [socket, userId]);
+
+    useEffect(() => {
+        if (isCreator) {
+            const intervalId = setInterval(() => {
+                axios.post('http://localhost:3001/api/challenge-details', { challengeId: localStorage.getItem('currentChallengeId') }, { withCredentials: true })
+                    .then(response => {
+                        setParticipants(response.data.participants);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching challenge details:', error);
+                    });
+            }, 5000); // Fetch challenge details every 5 seconds
+
+            return () => clearInterval(intervalId);
+        }
+    }, [isCreator]);
 
     if (!participants.length) {
         return <div>Loading participants...</div>;
