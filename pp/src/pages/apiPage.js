@@ -4,10 +4,14 @@ import './apiPage.css';
 import axios from 'axios'; // Note: axios is imported but not used in this code.
 
 function ApiPage() {
+   
+
     const [isConnected, setIsConnected] = useState(false);
     const [dashboard, setDashboard] = useState(''); // State to store dashboard data
 
     useEffect(() => {
+     
+    
         const checkConnectionStatus = async () => {
             try {
                 const response = await fetch('http://localhost:3001/api/check-wakatime-connection', {
@@ -25,15 +29,24 @@ function ApiPage() {
     }, []);
 
     useEffect(() => {
+
         const fetchWakaTimeData = async () => {
             if (isConnected) {
+                const challengeId = localStorage.getItem('currentChallengeId');
+                if (!challengeId) {
+                    console.error('Challenge ID is missing from local storage');
+                    return;
+                }
+            
+                console.log('Challenge ID:', challengeId); // Debugging log
+   
                 const startDate = new Date(); // Example: set the start date to today
                 startDate.setDate(startDate.getDate() - 7); // Adjust for the desired range, e.g., the last 7 days
                 const endDate = new Date(); // End date as today
 
                 const formatDate = (date) => date.toISOString().split('T')[0];
                 try {
-                    const response = await fetch("http://localhost:3001/wakatime/user-summaries", {
+                    const response = await fetch(`http://localhost:3001/wakatime/user-summaries/${challengeId}`, {
                         credentials: 'include'
                     });
                     if (!response.ok) {
